@@ -103,7 +103,10 @@ tab-saver/
 ├── dist/                      ← Compiled output. Loaded by Chrome. Don't edit by hand.
 │   ├── background.js
 │   └── lib.js
-├── icon.png                   ← Toolbar icon
+├── assets/
+│   ├── icon.png               ← Toolbar icon (referenced by manifest.json)
+│   ├── ui-workflows.jpg       ← Rendered diagram for README
+│   └── ui-workflows.svg       ← Source for ui-workflows.jpg
 ├── tsconfig.json              ← Strict TS, ES2022, DOM + chrome types; excludes tests
 └── package.json               ← npm scripts: build, watch, test
 ```

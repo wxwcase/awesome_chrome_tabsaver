@@ -18,7 +18,7 @@
   },
   "files": [
     "manifest.json",
-    "icon.png",
+    "assets/",
     "dist/"
   ],
   "npm-pretty-much": {

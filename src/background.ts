@@ -42,7 +42,7 @@ async function flashSaveBadge(recent: Collection[]): Promise<void> {
 function showSaveNotification(count: number): void {
   chrome.notifications.create({
     type: "basic",
-    iconUrl: "icon.png",
+    iconUrl: "assets/icon.png",
     title: `Saved ${count} tab${count === 1 ? "" : "s"}`,
     message:
       "Stored in chrome.storage.local — browser-internal, not a regular file. " +
