@@ -4,9 +4,9 @@ Chrome extension (Manifest V3). Click the toolbar icon to open a popup that lets
 
 Sources are in `src/` (`background.ts`, `popup.ts`, helpers in `lib.ts`); they compile to `dist/*.js`, which is what Chrome actually loads. There's no bundler — just `tsc`.
 
-> **Diagram out of date.** The image below was captured during the click-to-save era; the current UI is popup-centric. Treat it as a historical reference until it's regenerated.
+![Tab Saver UI workflow: toolbar icon opens a popup with Save all tabs, active-tab search, Switch / Close per result, and a control reference](assets/ui-workflows.jpg)
 
-![Tab Saver UI workflows: save flow with badge feedback, right-click menu structure, and multi-window save round-trip](assets/ui-workflows.jpg)
+> The diagram is a single-panel walk-through of the current popup: how the toolbar icon opens it, what the Save button and search input do, what Switch / Close / Focus call into the Chrome API, and how the right-click menu still surfaces saved collections. Source SVG lives at `assets/ui-workflows.svg`.
 
 ## Features
 
