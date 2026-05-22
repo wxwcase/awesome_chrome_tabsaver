@@ -7,9 +7,7 @@ interface Storage {
 }
 
 chrome.action.onClicked.addListener(async () => {
-  const tabs = await chrome.tabs.query({ currentWindow: true });
-  // To save tabs across all Chrome windows, swap the query above for the line below.
-  // const tabs = await chrome.tabs.query({});
+  const tabs = await chrome.tabs.query({});
   const collection: Collection = {
     savedAt: new Date().toISOString(),
     tabs: tabs.map((t) => ({ url: t.url, title: t.title, windowId: t.windowId })),
@@ -56,10 +54,20 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
   const collection = recent[index];
   if (!collection || collection.tabs.length === 0) return;
 
-  const urls = collection.tabs
-    .map((t) => t.url)
-    .filter((u): u is string => typeof u === "string");
-  await chrome.windows.create({ url: urls, focused: true });
+  const groups = new Map<number, string[]>();
+  for (const t of collection.tabs) {
+    if (typeof t.url !== "string") continue;
+    const list = groups.get(t.windowId) ?? [];
+    list.push(t.url);
+    groups.set(t.windowId, list);
+  }
+
+  let first = true;
+  for (const urls of groups.values()) {
+    if (urls.length === 0) continue;
+    await chrome.windows.create({ url: urls, focused: first });
+    first = false;
+  }
 });
 
 async function handleClearClick(): Promise<void> {
