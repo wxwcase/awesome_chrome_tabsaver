@@ -4,6 +4,8 @@ Chrome extension (Manifest V3) that saves every open tab across every Chrome win
 
 The source is `background.ts` (with helpers in `lib.ts`); it compiles to `background.js`, which is what Chrome actually loads. There's no bundler — just `tsc`.
 
+![Tab Saver UI workflows: save flow with badge feedback, right-click menu structure, and multi-window save round-trip](assets/ui-workflows.jpg)
+
 ## Features
 
 - **One-click save across all windows.** Click the toolbar icon to capture every tab in every Chrome window into a single collection. Each captured tab records its URL, title, and original window. A desktop notification confirms the save.

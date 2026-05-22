@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1100" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fafbfc"/>
+      <stop offset="1" stop-color="#eef1f5"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" in="SourceAlpha"/>
+      <feOffset dx="0" dy="2" result="offset"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3367d6"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f8a3b"/>
+    </marker>
+    <symbol id="tab-icon" viewBox="0 0 24 24">
+      <rect x="2" y="6" width="20" height="14" rx="2" fill="#fff" stroke="#5f6368" stroke-width="1.4"/>
+      <rect x="4" y="2" width="9" height="6" rx="1.5" fill="#fff" stroke="#5f6368" stroke-width="1.4"/>
+    </symbol>
+  </defs>
+
+  <rect width="1440" height="1100" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="720" y="50" text-anchor="middle" font-size="30" font-weight="700" fill="#202124">Tab Saver — UI workflows</text>
+  <text x="720" y="78" text-anchor="middle" font-size="15" fill="#5f6368">How saving, badge feedback, the right-click menu, and multi-window reopen feel in Chrome</text>
+
+  <!-- ======================== Panel 1: Save flow / badge states ======================== -->
+  <g transform="translate(40,120)">
+    <rect width="640" height="430" rx="12" fill="#ffffff" stroke="#dadce0" stroke-width="1.2" filter="url(#shadow)"/>
+    <text x="24" y="34" font-size="18" font-weight="700" fill="#202124">1. Click the toolbar icon → save</text>
+    <text x="24" y="58" font-size="13" fill="#5f6368">Badge flashes GREEN with the new tab count, then settles to BLUE.</text>
+
+    <!-- Three toolbar mini-mockups -->
+    <g transform="translate(24,90)">
+      <!-- Empty -->
+      <g transform="translate(0,0)">
+        <rect width="180" height="170" rx="10" fill="#f8f9fa" stroke="#e8eaed"/>
+        <text x="90" y="22" text-anchor="middle" font-size="12" font-weight="600" fill="#5f6368">Before any save</text>
+        <!-- Chrome toolbar strip -->
+        <rect x="14" y="38" width="152" height="40" rx="6" fill="#fff" stroke="#dadce0"/>
+        <use href="#tab-icon" x="68" y="46" width="28" height="28"/>
+        <text x="90" y="105" text-anchor="middle" font-size="11" fill="#5f6368">no badge</text>
+        <text x="90" y="135" text-anchor="middle" font-size="10" fill="#9aa0a6">storage: empty</text>
+      </g>
+
+      <!-- Just saved (green) -->
+      <g transform="translate(204,0)">
+        <rect width="180" height="170" rx="10" fill="#f8f9fa" stroke="#e8eaed"/>
+        <text x="90" y="22" text-anchor="middle" font-size="12" font-weight="600" fill="#1f8a3b">Just saved (≈3s)</text>
+        <rect x="14" y="38" width="152" height="40" rx="6" fill="#fff" stroke="#dadce0"/>
+        <use href="#tab-icon" x="68" y="46" width="28" height="28"/>
+        <!-- Green badge -->
+        <rect x="92" y="62" width="22" height="14" rx="2" fill="#1f8a3b"/>
+        <text x="103" y="73" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">10</text>
+        <text x="90" y="105" text-anchor="middle" font-size="11" fill="#5f6368">flash color: #1f8a3b</text>
+        <text x="90" y="125" text-anchor="middle" font-size="10" fill="#9aa0a6">+ desktop notification</text>
+        <text x="90" y="142" text-anchor="middle" font-size="10" fill="#9aa0a6">"Saved 10 tabs"</text>
+      </g>
+
+      <!-- Persistent (blue) -->
+      <g transform="translate(408,0)">
+        <rect width="180" height="170" rx="10" fill="#f8f9fa" stroke="#e8eaed"/>
+        <text x="90" y="22" text-anchor="middle" font-size="12" font-weight="600" fill="#3367d6">After flash settles</text>
+        <rect x="14" y="38" width="152" height="40" rx="6" fill="#fff" stroke="#dadce0"/>
+        <use href="#tab-icon" x="68" y="46" width="28" height="28"/>
+        <!-- Blue badge -->
+        <rect x="92" y="62" width="22" height="14" rx="2" fill="#3367d6"/>
+        <text x="103" y="73" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">10</text>
+        <text x="90" y="105" text-anchor="middle" font-size="11" fill="#5f6368">persistent: #3367d6</text>
+        <text x="90" y="125" text-anchor="middle" font-size="10" fill="#9aa0a6">survives browser restart</text>
+        <text x="90" y="142" text-anchor="middle" font-size="10" fill="#9aa0a6">always = recent[0].tabs.length</text>
+      </g>
+    </g>
+
+    <!-- Arrows between mockups -->
+    <line x1="220" y1="140" x2="244" y2="140" stroke="#1f8a3b" stroke-width="2" marker-end="url(#arrow-green)"/>
+    <text x="232" y="130" text-anchor="middle" font-size="10" fill="#1f8a3b" font-weight="600">click</text>
+    <line x1="424" y1="140" x2="448" y2="140" stroke="#3367d6" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="436" y="130" text-anchor="middle" font-size="10" fill="#3367d6" font-weight="600">3s</text>
+
+    <!-- Action → badge table -->
+    <g transform="translate(24,290)">
+      <text x="0" y="0" font-size="13" font-weight="700" fill="#202124">Badge transitions</text>
+      <g transform="translate(0,16)" font-size="12" fill="#3c4043">
+        <rect width="592" height="22" fill="#f1f3f4"/>
+        <text x="10" y="15" font-weight="600">Action</text>
+        <text x="240" y="15" font-weight="600">Badge result</text>
+
+        <g transform="translate(0,22)"><text x="10" y="15">Save (new URL list)</text><text x="240" y="15">GREEN N → BLUE N after 3s</text></g>
+        <g transform="translate(0,42)"><rect width="592" height="20" fill="#fafbfc"/><text x="10" y="15">Save (same URL list)</text><text x="240" y="15">unchanged (no-op)</text></g>
+        <g transform="translate(0,62)"><text x="10" y="15">Delete one entry</text><text x="240" y="15">BLUE — count of new recent[0]</text></g>
+        <g transform="translate(0,82)"><rect width="592" height="20" fill="#fafbfc"/><text x="10" y="15">Clear all</text><text x="240" y="15">empty</text></g>
+        <g transform="translate(0,102)"><text x="10" y="15">Browser restart</text><text x="240" y="15">BLUE — restored from storage</text></g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ======================== Panel 2: Right-click menu ======================== -->
+  <g transform="translate(720,120)">
+    <rect width="640" height="430" rx="12" fill="#ffffff" stroke="#dadce0" stroke-width="1.2" filter="url(#shadow)"/>
+    <text x="24" y="34" font-size="18" font-weight="700" fill="#202124">2. Right-click → manage saves</text>
+    <text x="24" y="58" font-size="13" fill="#5f6368">Each entry expands into Open / Delete. "Clear all" only on the icon menu.</text>
+
+    <!-- Toolbar with icon + cursor -->
+    <g transform="translate(24,80)">
+      <rect width="280" height="50" rx="8" fill="#f8f9fa" stroke="#dadce0"/>
+      <use href="#tab-icon" x="20" y="13" width="24" height="24"/>
+      <rect x="42" y="22" width="20" height="12" rx="2" fill="#3367d6"/>
+      <text x="52" y="32" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">10</text>
+      <text x="80" y="30" font-size="11" fill="#5f6368">[icon]  ← right-click here</text>
+      <!-- cursor -->
+      <path d="M48 50 L58 70 L62 60 L72 60 Z" fill="#202124"/>
+    </g>
+
+    <!-- Top-level menu -->
+    <g transform="translate(24,150)">
+      <rect width="280" height="160" rx="8" fill="#fff" stroke="#dadce0" filter="url(#shadow)"/>
+      <text x="14" y="24" font-size="12" fill="#3c4043">Load tab collection</text>
+      <text x="262" y="24" text-anchor="end" font-size="14" fill="#5f6368">▸</text>
+      <line x1="0" y1="34" x2="280" y2="34" stroke="#e8eaed"/>
+      <text x="14" y="54" font-size="12" fill="#3c4043">Clear all saved tab collections (3)</text>
+      <text x="14" y="78" font-size="10" fill="#9aa0a6">↑ icon-only; disabled when N == 0</text>
+      <text x="14" y="110" font-size="10" fill="#9aa0a6">page right-click hides "Clear all"</text>
+      <text x="14" y="125" font-size="10" fill="#9aa0a6">but shows "Load tab collection ▸"</text>
+    </g>
+
+    <!-- Submenu: entries -->
+    <g transform="translate(310,150)">
+      <rect width="305" height="160" rx="8" fill="#fff" stroke="#dadce0" filter="url(#shadow)"/>
+      <g font-size="12" fill="#3c4043">
+        <text x="14" y="24">12/05/2025, 10:14 AM (10 tabs)</text>
+        <text x="290" y="24" text-anchor="end" fill="#5f6368">▸</text>
+        <line x1="0" y1="34" x2="305" y2="34" stroke="#e8eaed"/>
+        <text x="14" y="54">12/04/2025, 6:41 PM (8 tabs)</text>
+        <text x="290" y="54" text-anchor="end" fill="#5f6368">▸</text>
+        <line x1="0" y1="64" x2="305" y2="64" stroke="#e8eaed"/>
+        <text x="14" y="84">12/04/2025, 9:03 AM (15 tabs)</text>
+        <text x="290" y="84" text-anchor="end" fill="#5f6368">▸</text>
+      </g>
+      <text x="14" y="115" font-size="10" fill="#9aa0a6">3 most recent (older still in storage)</text>
+    </g>
+
+    <!-- Submenu: open/delete -->
+    <g transform="translate(310,330)">
+      <rect width="305" height="74" rx="8" fill="#fff" stroke="#dadce0" filter="url(#shadow)"/>
+      <text x="14" y="26" font-size="12" fill="#3c4043">Open</text>
+      <text x="290" y="26" text-anchor="end" font-size="10" fill="#9aa0a6">reopens, preserves windows</text>
+      <line x1="0" y1="38" x2="305" y2="38" stroke="#e8eaed"/>
+      <text x="14" y="58" font-size="12" fill="#d93025">Delete</text>
+      <text x="290" y="58" text-anchor="end" font-size="10" fill="#9aa0a6">removes only this entry</text>
+    </g>
+
+    <!-- Connector arrow from entry to open/delete submenu -->
+    <line x1="595" y1="234" x2="615" y2="234" stroke="#5f6368" stroke-width="1.4" stroke-dasharray="3,3"/>
+    <line x1="615" y1="234" x2="615" y2="350" stroke="#5f6368" stroke-width="1.4" stroke-dasharray="3,3"/>
+    <line x1="615" y1="350" x2="624" y2="350" stroke="#5f6368" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- ======================== Panel 3: Multi-window reopen ======================== -->
+  <g transform="translate(40,580)">
+    <rect width="1360" height="480" rx="12" fill="#ffffff" stroke="#dadce0" stroke-width="1.2" filter="url(#shadow)"/>
+    <text x="24" y="34" font-size="18" font-weight="700" fill="#202124">3. Multi-window save round-trips</text>
+    <text x="24" y="58" font-size="13" fill="#5f6368">Each tab remembers its windowId. On Open, tabs are regrouped and reopened as separate windows — your save's shape is preserved.</text>
+
+    <!-- LEFT: at save time (3 windows) -->
+    <text x="40" y="100" font-size="13" font-weight="700" fill="#3c4043">Before save — 3 Chrome windows open</text>
+    <g transform="translate(40,120)">
+      <!-- Window A -->
+      <g transform="translate(0,0)">
+        <rect width="220" height="180" rx="10" fill="#fff" stroke="#dadce0"/>
+        <rect width="220" height="28" rx="10" fill="#f1f3f4"/>
+        <rect y="18" width="220" height="10" fill="#f1f3f4"/>
+        <circle cx="14" cy="14" r="5" fill="#ea4335"/>
+        <circle cx="30" cy="14" r="5" fill="#fbbc04"/>
+        <circle cx="46" cy="14" r="5" fill="#34a853"/>
+        <text x="110" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#3c4043">Window A</text>
+        <g font-size="11" fill="#3c4043">
+          <rect x="10" y="40" width="200" height="22" rx="4" fill="#e8f0fe"/><text x="20" y="55">tab1 — github.com</text>
+          <rect x="10" y="68" width="200" height="22" rx="4" fill="#fff" stroke="#e8eaed"/><text x="20" y="83">tab2 — docs.…</text>
+          <rect x="10" y="96" width="200" height="22" rx="4" fill="#fff" stroke="#e8eaed"/><text x="20" y="111">tab3 — news.…</text>
+        </g>
+        <text x="110" y="160" text-anchor="middle" font-size="10" fill="#9aa0a6">windowId = A</text>
+      </g>
+
+      <!-- Window B -->
+      <g transform="translate(244,0)">
+        <rect width="220" height="180" rx="10" fill="#fff" stroke="#dadce0"/>
+        <rect width="220" height="28" rx="10" fill="#f1f3f4"/>
+        <rect y="18" width="220" height="10" fill="#f1f3f4"/>
+        <circle cx="14" cy="14" r="5" fill="#ea4335"/>
+        <circle cx="30" cy="14" r="5" fill="#fbbc04"/>
+        <circle cx="46" cy="14" r="5" fill="#34a853"/>
+        <text x="110" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#3c4043">Window B</text>
+        <g font-size="11" fill="#3c4043">
+          <rect x="10" y="40" width="200" height="22" rx="4" fill="#e8f0fe"/><text x="20" y="55">tab4 — mail.…</text>
+          <rect x="10" y="68" width="200" height="22" rx="4" fill="#fff" stroke="#e8eaed"/><text x="20" y="83">tab5 — calendar.…</text>
+        </g>
+        <text x="110" y="160" text-anchor="middle" font-size="10" fill="#9aa0a6">windowId = B</text>
+      </g>
+
+      <!-- Window C -->
+      <g transform="translate(488,0)">
+        <rect width="160" height="180" rx="10" fill="#fff" stroke="#dadce0"/>
+        <rect width="160" height="28" rx="10" fill="#f1f3f4"/>
+        <rect y="18" width="160" height="10" fill="#f1f3f4"/>
+        <circle cx="14" cy="14" r="5" fill="#ea4335"/>
+        <circle cx="30" cy="14" r="5" fill="#fbbc04"/>
+        <circle cx="46" cy="14" r="5" fill="#34a853"/>
+        <text x="80" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#3c4043">Window C</text>
+        <g font-size="11" fill="#3c4043">
+          <rect x="10" y="40" width="140" height="22" rx="4" fill="#e8f0fe"/><text x="20" y="55">tab6 — slack.…</text>
+        </g>
+        <text x="80" y="160" text-anchor="middle" font-size="10" fill="#9aa0a6">windowId = C</text>
+      </g>
+    </g>
+
+    <!-- Save arrow pointing to JSON -->
+    <line x1="690" y1="200" x2="760" y2="200" stroke="#3367d6" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="725" y="190" text-anchor="middle" font-size="11" fill="#3367d6" font-weight="600">click icon</text>
+    <text x="725" y="220" text-anchor="middle" font-size="10" fill="#5f6368">save as one Collection</text>
+
+    <!-- MIDDLE: storage payload -->
+    <g transform="translate(770,100)">
+      <text x="0" y="0" font-size="13" font-weight="700" fill="#3c4043">chrome.storage.local — recent[0]</text>
+      <rect y="14" width="280" height="280" rx="8" fill="#202124"/>
+      <g font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="11" fill="#e8eaed">
+        <text x="14" y="36">{</text>
+        <text x="26" y="54"><tspan fill="#9aa0a6">savedAt:</tspan> <tspan fill="#a8c7fa">"2025-12-05…"</tspan>,</text>
+        <text x="26" y="72"><tspan fill="#9aa0a6">tabs:</tspan> [</text>
+        <text x="40" y="90">{ url: tab1, windowId: <tspan fill="#fbbc04">A</tspan> },</text>
+        <text x="40" y="108">{ url: tab2, windowId: <tspan fill="#fbbc04">A</tspan> },</text>
+        <text x="40" y="126">{ url: tab3, windowId: <tspan fill="#fbbc04">A</tspan> },</text>
+        <text x="40" y="144">{ url: tab4, windowId: <tspan fill="#34a853">B</tspan> },</text>
+        <text x="40" y="162">{ url: tab5, windowId: <tspan fill="#34a853">B</tspan> },</text>
+        <text x="40" y="180">{ url: tab6, windowId: <tspan fill="#ea4335">C</tspan> },</text>
+        <text x="26" y="198">]</text>
+        <text x="14" y="216">}</text>
+      </g>
+      <text x="140" y="320" text-anchor="middle" font-size="10" fill="#9aa0a6">Open groups by windowId →</text>
+    </g>
+
+    <!-- Right arrow Open -->
+    <line x1="1058" y1="200" x2="1088" y2="200" stroke="#1f8a3b" stroke-width="2" marker-end="url(#arrow-green)"/>
+    <text x="1073" y="190" text-anchor="middle" font-size="11" fill="#1f8a3b" font-weight="600">Open</text>
+
+    <!-- RIGHT: reopened windows -->
+    <text x="1098" y="100" font-size="13" font-weight="700" fill="#3c4043">After Open — 3 new windows</text>
+    <g transform="translate(1098,120)">
+      <!-- Window A' -->
+      <g transform="translate(0,0)">
+        <rect width="180" height="180" rx="10" fill="#fff" stroke="#dadce0"/>
+        <rect width="180" height="28" rx="10" fill="#f1f3f4"/>
+        <rect y="18" width="180" height="10" fill="#f1f3f4"/>
+        <circle cx="14" cy="14" r="5" fill="#ea4335"/>
+        <circle cx="30" cy="14" r="5" fill="#fbbc04"/>
+        <circle cx="46" cy="14" r="5" fill="#34a853"/>
+        <text x="90" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#3c4043">Window A′</text>
+        <g font-size="11" fill="#3c4043">
+          <rect x="10" y="40" width="160" height="20" rx="4" fill="#e8f0fe"/><text x="20" y="54">tab1</text>
+          <rect x="10" y="64" width="160" height="20" rx="4" fill="#fff" stroke="#e8eaed"/><text x="20" y="78">tab2</text>
+          <rect x="10" y="88" width="160" height="20" rx="4" fill="#fff" stroke="#e8eaed"/><text x="20" y="102">tab3</text>
+        </g>
+      </g>
+
+      <!-- Window B' -->
+      <g transform="translate(0,200)">
+        <rect width="180" height="80" rx="10" fill="#fff" stroke="#dadce0"/>
+        <rect width="180" height="28" rx="10" fill="#f1f3f4"/>
+        <rect y="18" width="180" height="10" fill="#f1f3f4"/>
+        <circle cx="14" cy="14" r="5" fill="#ea4335"/>
+        <circle cx="30" cy="14" r="5" fill="#fbbc04"/>
+        <circle cx="46" cy="14" r="5" fill="#34a853"/>
+        <text x="90" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#3c4043">Window B′</text>
+        <g font-size="11" fill="#3c4043">
+          <rect x="10" y="38" width="76" height="20" rx="4" fill="#e8f0fe"/><text x="20" y="52">tab4</text>
+          <rect x="94" y="38" width="76" height="20" rx="4" fill="#fff" stroke="#e8eaed"/><text x="104" y="52">tab5</text>
+        </g>
+      </g>
+
+      <!-- Window C' -->
+      <g transform="translate(0,300)">
+        <rect width="180" height="60" rx="10" fill="#fff" stroke="#dadce0"/>
+        <rect width="180" height="28" rx="10" fill="#f1f3f4"/>
+        <rect y="18" width="180" height="10" fill="#f1f3f4"/>
+        <circle cx="14" cy="14" r="5" fill="#ea4335"/>
+        <circle cx="30" cy="14" r="5" fill="#fbbc04"/>
+        <circle cx="46" cy="14" r="5" fill="#34a853"/>
+        <text x="90" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#3c4043">Window C′</text>
+        <g font-size="11" fill="#3c4043">
+          <rect x="10" y="38" width="160" height="20" rx="4" fill="#e8f0fe"/><text x="20" y="52">tab6</text>
+        </g>
+      </g>
+    </g>
+
+    <text x="660" y="465" text-anchor="middle" font-size="11" fill="#5f6368">A 3-window save reopens as 3 windows. New OS-level window IDs, but per-window grouping is preserved.</text>
+  </g>
+</svg>
