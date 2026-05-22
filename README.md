@@ -1,8 +1,10 @@
 # Tab Saver
 
-Chrome extension (Manifest V3) that saves every open tab across every Chrome window when you click the toolbar icon, and lets you reopen recent collections from the right-click "Load tab collection" submenu.
+Chrome extension (Manifest V3). Click the toolbar icon to open a popup that lets you save every open tab across every Chrome window, search your currently open tabs (Switch / Close), or jump to the right-click "Load tab collection" submenu to reopen a saved snapshot.
 
-The source is `background.ts` (with helpers in `lib.ts`); it compiles to `background.js`, which is what Chrome actually loads. There's no bundler — just `tsc`.
+Sources are in `src/` (`background.ts`, `popup.ts`, helpers in `lib.ts`); they compile to `dist/*.js`, which is what Chrome actually loads. There's no bundler — just `tsc`.
+
+> **Diagram out of date.** The image below was captured during the click-to-save era; the current UI is popup-centric. Treat it as a historical reference until it's regenerated.
 
 ![Tab Saver UI workflows: save flow with badge feedback, right-click menu structure, and multi-window save round-trip](assets/ui-workflows.jpg)
 
@@ -10,7 +12,7 @@ The source is `background.ts` (with helpers in `lib.ts`); it compiles to `backgr
 
 - **Save from the toolbar popup.** Click the toolbar icon to open a small popup with a "Save all tabs" button at the top. One click captures every tab in every Chrome window into a single collection (URL, title, original window). A desktop notification confirms the save and the badge updates.
 - **Persistent badge with the latest count.** A blue badge on the toolbar icon shows the number of tabs in your **most recent** saved collection. It survives browser restarts and updates whenever you save, delete, or clear. Right after a save the badge briefly flashes **green** for 3 seconds, then settles back to blue.
-- **Skip duplicate saves.** If your tab list (URLs and order) is identical to the most recent saved collection, the click is a no-op — no new entry, no notification. Repeated clicks won't pollute history.
+- **Skip duplicate saves.** If your tab list (URLs and order) is identical to the most recent saved collection, **Save all tabs** is a no-op — the button shows "Already saved", no new entry is added, and no notification fires. Repeated saves won't pollute history.
 - **Right-click to manage a collection.** The "Load tab collection" submenu lists your **3 most recent** snapshots (most recent first), each labeled with its save timestamp and tab count. Each entry expands into an **Open** / **Delete** submenu — Open reopens the URLs as new windows (**preserving the original multi-window grouping**, so a save that spanned three windows reopens as three windows); Delete removes just that entry from storage.
 - **Search active tabs from the popup.** The same toolbar popup includes a search input that filters your **currently open** tabs by title or URL (case-insensitive substring). Results group by Chrome window and offer **Switch** (focus that tab + window) or **Close** (close that tab) per result. Useful when you have dozens of tabs across multiple windows and need to jump to a specific one without scanning visually.
 - **One-click clear.** Right-click the extension **icon** → "Clear all saved tab collections (N)" wipes every saved collection and clears the badge. The menu item is disabled when there's nothing to clear.
@@ -58,7 +60,7 @@ npm run build       # one-shot tsc compile
 npm run watch       # tsc --watch during active development
 ```
 
-Output: `dist/background.js` (and `dist/lib.js`). `tsconfig.json` targets `outDir: ./dist` and excludes test files so `dist/` stays Chrome-loadable.
+Output: `dist/background.js`, `dist/popup.js`, and `dist/lib.js`. `tsconfig.json` targets `outDir: ./dist` and excludes test files so `dist/` stays Chrome-loadable.
 
 **Amazon Brazil:**
 
@@ -66,7 +68,7 @@ Output: `dist/background.js` (and `dist/lib.js`). `tsconfig.json` targets `outDi
 brazil-build        # runs the package's build (tsc + npm-pretty-much wiring)
 ```
 
-Output: same `dist/background.js` and `dist/lib.js` — the Brazil flow honors the same `tsconfig.json`.
+Output: same `dist/background.js`, `dist/popup.js`, and `dist/lib.js` — the Brazil flow honors the same `tsconfig.json`.
 
 ### 3. Load the unpacked extension into Chrome
 
@@ -129,9 +131,10 @@ tab-saver/
 ### Where to add code
 
 - **Pure logic** (decision functions, predicates, data transforms) → `src/lib.ts`. Add a test in `src/__tests__/lib.spec.ts` next to it.
-- **Chrome API wiring** (event listeners, badge/notification side effects, context-menu rebuilds) → `src/background.ts`. Keep listeners thin; defer to helpers in `lib.ts` for any non-trivial decision.
+- **Service-worker / Chrome API wiring** (event listeners, badge/notification side effects, context-menu rebuilds, message handlers) → `src/background.ts`. Keep listeners thin; defer to helpers in `lib.ts` for any non-trivial decision.
+- **Popup UI** (DOM rendering, search input, tab actions like Switch/Close, save button) → `src/popup.ts`. The popup talks to the service worker via `chrome.runtime.sendMessage` for anything that touches storage (e.g., `{ type: "save-tabs" }`).
 
-This split is intentional: anything in `lib.ts` is testable without mocking `chrome.*`, and `background.ts` stays small enough to read top-to-bottom.
+This split is intentional: `lib.ts` is testable without mocking `chrome.*`, `background.ts` stays small enough to read top-to-bottom, and `popup.ts` owns nothing that needs to survive the popup closing.
 
 ### Service-worker quirks
 
@@ -158,4 +161,4 @@ Listener-level tests (mocking `chrome.*`) aren't set up. The bulk of decision lo
 1. `npm run build` (or have `npm run watch` running).
 2. `npm test` — make sure helpers still pass.
 3. Click reload on the extension's `chrome://extensions` card.
-4. Open the service-worker DevTools and exercise the change. Save, reopen, delete-one, and clear-all all hit different code paths; the badge should stay in sync with `recent[0]`.
+4. Open the popup and the service-worker DevTools, and exercise the change. Save (button), search-and-Switch, search-and-Close, reopen, delete-one, and clear-all all hit different code paths; the badge should stay in sync with `recent[0]`. To debug `popup.ts`, right-click inside the open popup → **Inspect** opens DevTools attached to the popup page (separate from the service worker).
