@@ -1,11 +1,15 @@
 {
   "extends": ["@tsconfig/node24"],
   "compilerOptions": {
+    "lib": ["ES2024", "DOM"],
+    "types": ["chrome"],
+    "noUncheckedIndexedAccess": true,
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
     "declarationMap": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/__tests__", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }

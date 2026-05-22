@@ -16,11 +16,10 @@
     "test": "vitest run --coverage",
     "posttest": "generate-coverage-data --language typescript"
   },
-  "main": "./dist/math.js",
-  "exports": "./dist/math.js",
   "files": [
-    "dist/",
-    "!/dist/**/__tests__/*"
+    "manifest.json",
+    "icon.png",
+    "dist/"
   ],
   "npm-pretty-much": {
     "runTest": "never"
@@ -28,6 +27,7 @@
   "devDependencies": {
     "@amzn/brazil": "^2.1.0",
     "@tsconfig/node24": "^24.0.4",
+    "@types/chrome": "^0.0.270",
     "@vitest/coverage-v8": "^4.1.2",
     "typescript": "~6.0.2",
     "vitest": "^4.1.2"
