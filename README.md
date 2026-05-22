@@ -6,10 +6,11 @@ The source is `background.ts` (with helpers in `lib.ts`); it compiles to `backgr
 
 ## Features
 
-- **One-click save across all windows.** Click the toolbar icon to capture every tab in every Chrome window into a single collection. Each captured tab records its URL, title, and original window. A green count badge on the icon and a desktop notification confirm the save.
-- **Skip duplicate saves.** If your tab list (URLs and order) is identical to the most recent saved collection, the click is a no-op — no new entry, no badge, no notification. Repeated clicks won't pollute history.
-- **Right-click to reload a collection.** The "Load tab collection" submenu lists your **3 most recent** snapshots (most recent first), each labeled with its save timestamp and tab count. Picking one reopens those URLs as new windows, **preserving the original multi-window grouping** — a save that spanned three windows reopens as three windows.
-- **One-click clear.** Right-click the extension **icon** → "Clear all saved tab collections (N)" wipes every saved collection. A green `0` badge briefly confirms. The menu item is disabled when there's nothing to clear.
+- **One-click save across all windows.** Click the toolbar icon to capture every tab in every Chrome window into a single collection. Each captured tab records its URL, title, and original window. A desktop notification confirms the save.
+- **Persistent badge with the latest count.** A blue badge on the toolbar icon shows the number of tabs in your **most recent** saved collection. It survives browser restarts and updates whenever you save, delete, or clear. Right after a save the badge briefly flashes **green** for 3 seconds, then settles back to blue.
+- **Skip duplicate saves.** If your tab list (URLs and order) is identical to the most recent saved collection, the click is a no-op — no new entry, no notification. Repeated clicks won't pollute history.
+- **Right-click to manage a collection.** The "Load tab collection" submenu lists your **3 most recent** snapshots (most recent first), each labeled with its save timestamp and tab count. Each entry expands into an **Open** / **Delete** submenu — Open reopens the URLs as new windows (**preserving the original multi-window grouping**, so a save that spanned three windows reopens as three windows); Delete removes just that entry from storage.
+- **One-click clear.** Right-click the extension **icon** → "Clear all saved tab collections (N)" wipes every saved collection and clears the badge. The menu item is disabled when there's nothing to clear.
 - **Storage caps.** Up to **1000 collections** are kept, and the entire `recent` array is trimmed (oldest first) to stay under **~1 MiB** when serialized. The most recent save is always kept, even if it would push you over the limit.
 - **Visible storage location.** The post-save notification tells you that data lives in `chrome.storage.local` (browser-internal, not a regular file) and includes the on-disk path Chrome uses on macOS. Useful when you're wondering "where did that go?"
 - **Persists across browser restarts.** Collections live in `chrome.storage.local`, so they survive Chrome restarts and the MV3 service worker being suspended between clicks.
@@ -50,11 +51,11 @@ Same idea, but resolves dependencies through the internal registry. Add registry
 **External:**
 
 ```sh
-npm run build       # one-shot tsc compile next to the source
+npm run build       # one-shot tsc compile
 npm run watch       # tsc --watch during active development
 ```
 
-Output: `background.js` next to `background.ts`.
+Output: `dist/background.js` (and `dist/lib.js`). `tsconfig.json` targets `outDir: ./dist` and excludes test files so `dist/` stays Chrome-loadable.
 
 **Amazon Brazil:**
 
@@ -62,16 +63,14 @@ Output: `background.js` next to `background.ts`.
 brazil-build        # runs the package's build (tsc + npm-pretty-much wiring)
 ```
 
-Output: `dist/background.js` (and `dist/lib.js`). The Brazil flow honors the package's `tsconfig.json`, which targets `outDir: ./dist` and excludes the test files so `dist/` stays Chrome-loadable.
+Output: same `dist/background.js` and `dist/lib.js` — the Brazil flow honors the same `tsconfig.json`.
 
 ### 3. Load the unpacked extension into Chrome
 
 1. Open `chrome://extensions` in Chrome.
 2. Toggle **Developer mode** on (top-right).
 3. Click **Load unpacked**.
-4. Select the directory **containing `manifest.json`** — the package root (not `dist/`). The manifest's `service_worker` path tells Chrome where to find the compiled JS:
-   - External flow → `background.js` (root)
-   - Brazil flow → `dist/background.js`
+4. Select the directory **containing `manifest.json`** — the package root (not `dist/`). The manifest's `service_worker` points to `dist/background.js`, so Chrome loads the compiled output regardless of which build flow you used.
 
 The extension's icon should appear in the toolbar. Pin it if you want it always visible.
 
@@ -83,9 +82,10 @@ After every build, click the circular reload icon on the extension's card at `ch
 
 ## Usage
 
-- **Save** — click the toolbar icon. Every tab in every Chrome window is captured into a single collection. A green count badge shows on the icon for a few seconds and a desktop notification confirms the save and points to where the data lives (`chrome.storage.local`, browser-internal — not a regular file). If the URL list (in order) is identical to your most recent save, nothing new is recorded.
-- **Reopen** — right-click anywhere on a page (or on the extension icon) → **Load tab collection** → pick a snapshot. URLs are reopened grouped by their original window, so a multi-window save round-trips as multiple windows.
-- **Clear** — right-click the extension **icon** (action menu only) → **Clear all saved tab collections (N)**. One click wipes every saved collection; a green `0` badge briefly confirms the action.
+- **Save** — click the toolbar icon. Every tab in every Chrome window is captured into a single collection. The toolbar badge flashes green for 3 seconds with the new collection's tab count, then settles back to blue. A desktop notification confirms the save and points to where the data lives (`chrome.storage.local`, browser-internal — not a regular file). If the URL list (in order) is identical to your most recent save, nothing new is recorded.
+- **Reopen** — right-click anywhere on a page (or on the extension icon) → **Load tab collection** → pick a snapshot → **Open**. URLs are reopened grouped by their original window, so a multi-window save round-trips as multiple windows.
+- **Delete one entry** — same path: **Load tab collection** → pick a snapshot → **Delete**. Removes only that entry; the badge updates to the new most-recent collection's count (or clears if nothing's left).
+- **Clear all** — right-click the extension **icon** (action menu only) → **Clear all saved tab collections (N)**. One click wipes every saved collection and clears the badge.
 
 ## Developer
 
@@ -93,17 +93,20 @@ After every build, click the circular reload icon on the extension's card at `ch
 
 ```
 tab-saver/
-├── manifest.json     ← Chrome extension manifest (MV3)
-├── background.ts     ← Service-worker entry: chrome.* listeners, menu rebuild
-├── lib.ts            ← Pure helpers (sameUrls, trim, nextRecent, …)
-├── lib.test.ts       ← Vitest tests for lib.ts
-├── background.js     ← Compiled output. Loaded by Chrome. Don't edit by hand.
-├── icon.png          ← Toolbar icon
-├── tsconfig.json     ← Strict TS, ES2022, DOM + chrome types
-└── package.json      ← npm scripts: build, watch, test
+├── manifest.json              ← Chrome extension manifest (MV3)
+├── src/
+│   ├── background.ts          ← Service-worker entry: chrome.* listeners, menu rebuild, badge
+│   ├── lib.ts                 ← Pure helpers (sameUrls, trim, nextRecent, …)
+│   └── __tests__/lib.spec.ts  ← Vitest tests for lib.ts
+├── dist/                      ← Compiled output. Loaded by Chrome. Don't edit by hand.
+│   ├── background.js
+│   └── lib.js
+├── icon.png                   ← Toolbar icon
+├── tsconfig.json              ← Strict TS, ES2022, DOM + chrome types; excludes tests
+└── package.json               ← npm scripts: build, watch, test
 ```
 
-`tsconfig.json` only includes `background.ts` and `lib.ts`, so the test file does **not** end up in the compiled output that Chrome loads. Vitest uses its own transform path.
+`tsconfig.json` includes `src/**/*.ts` but **excludes** `src/__tests__/**`, so test files don't end up in the compiled output that Chrome loads. Vitest uses its own transform path.
 
 ### npm scripts
 
@@ -115,8 +118,8 @@ tab-saver/
 
 ### Where to add code
 
-- **Pure logic** (decision functions, predicates, data transforms) → `lib.ts`. Add a test in `lib.test.ts` next to it.
-- **Chrome API wiring** (event listeners, badge/notification side effects, context-menu rebuilds) → `background.ts`. Keep listeners thin; defer to helpers in `lib.ts` for any non-trivial decision.
+- **Pure logic** (decision functions, predicates, data transforms) → `src/lib.ts`. Add a test in `src/__tests__/lib.spec.ts` next to it.
+- **Chrome API wiring** (event listeners, badge/notification side effects, context-menu rebuilds) → `src/background.ts`. Keep listeners thin; defer to helpers in `lib.ts` for any non-trivial decision.
 
 This split is intentional: anything in `lib.ts` is testable without mocking `chrome.*`, and `background.ts` stays small enough to read top-to-bottom.
 
@@ -132,7 +135,7 @@ Tests run on Node — no Chrome required. They cover only the pure helpers in `l
 
 ```sh
 # Run a single test file
-npx vitest run lib.test.ts
+npx vitest run src/__tests__/lib.spec.ts
 
 # Watch mode while editing
 npx vitest
@@ -145,4 +148,4 @@ Listener-level tests (mocking `chrome.*`) aren't set up. The bulk of decision lo
 1. `npm run build` (or have `npm run watch` running).
 2. `npm test` — make sure helpers still pass.
 3. Click reload on the extension's `chrome://extensions` card.
-4. Open the service-worker DevTools and exercise the change. Save, reopen, and clear all hit different code paths.
+4. Open the service-worker DevTools and exercise the change. Save, reopen, delete-one, and clear-all all hit different code paths; the badge should stay in sync with `recent[0]`.

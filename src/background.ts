@@ -1,6 +1,9 @@
 import { type Collection, nextRecent } from "./lib.js";
 
 const MENU_VISIBLE = 3;
+const BADGE_COLOR_DEFAULT = "#3367d6";
+const BADGE_COLOR_SAVED = "#1f8a3b";
+const SAVE_FLASH_MS = 3000;
 
 interface Storage {
   recent?: Collection[];
@@ -19,14 +22,24 @@ chrome.action.onClicked.addListener(async () => {
   await chrome.storage.local.set({ recent: updated });
 
   await rebuildContextMenus();
-  await showSaveFeedback(collection.tabs.length);
+  await flashSaveBadge(updated);
+  showSaveNotification(collection.tabs.length);
 });
 
-async function showSaveFeedback(count: number): Promise<void> {
-  await chrome.action.setBadgeBackgroundColor({ color: "#1f8a3b" });
-  await chrome.action.setBadgeText({ text: String(count) });
-  setTimeout(() => chrome.action.setBadgeText({ text: "" }), 3000);
+async function updateBadge(recent: Collection[]): Promise<void> {
+  const latest = recent[0];
+  await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR_DEFAULT });
+  await chrome.action.setBadgeText({ text: latest ? String(latest.tabs.length) : "" });
+}
 
+async function flashSaveBadge(recent: Collection[]): Promise<void> {
+  const latest = recent[0];
+  await chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR_SAVED });
+  await chrome.action.setBadgeText({ text: latest ? String(latest.tabs.length) : "" });
+  setTimeout(() => updateBadge(recent), SAVE_FLASH_MS);
+}
+
+function showSaveNotification(count: number): void {
   chrome.notifications.create({
     type: "basic",
     iconUrl: "icon.png",
@@ -46,10 +59,20 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     return;
   }
 
-  const match = id.match(/^tab-saver-load-(\d+)$/);
-  if (!match) return;
+  const openMatch = id.match(/^tab-saver-open-(\d+)$/);
+  if (openMatch) {
+    await handleOpenClick(parseInt(openMatch[1]!, 10));
+    return;
+  }
 
-  const index = parseInt(match[1]!, 10);
+  const deleteMatch = id.match(/^tab-saver-delete-(\d+)$/);
+  if (deleteMatch) {
+    await handleDeleteClick(parseInt(deleteMatch[1]!, 10));
+    return;
+  }
+});
+
+async function handleOpenClick(index: number): Promise<void> {
   const { recent = [] } = (await chrome.storage.local.get("recent")) as Storage;
   const collection = recent[index];
   if (!collection || collection.tabs.length === 0) return;
@@ -68,22 +91,31 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     await chrome.windows.create({ url: urls, focused: first });
     first = false;
   }
-});
+}
+
+async function handleDeleteClick(index: number): Promise<void> {
+  const { recent = [] } = (await chrome.storage.local.get("recent")) as Storage;
+  if (index < 0 || index >= recent.length) return;
+  const updated = recent.slice(0, index).concat(recent.slice(index + 1));
+  await chrome.storage.local.set({ recent: updated });
+  await rebuildContextMenus();
+  await updateBadge(updated);
+}
 
 async function handleClearClick(): Promise<void> {
   await chrome.storage.local.set({ recent: [] });
   await rebuildContextMenus();
-  await showClearFeedback();
+  await updateBadge([]);
 }
 
-async function showClearFeedback(): Promise<void> {
-  await chrome.action.setBadgeBackgroundColor({ color: "#1f8a3b" });
-  await chrome.action.setBadgeText({ text: "0" });
-  setTimeout(() => chrome.action.setBadgeText({ text: "" }), 3000);
+async function restoreState(): Promise<void> {
+  await rebuildContextMenus();
+  const { recent = [] } = (await chrome.storage.local.get("recent")) as Storage;
+  await updateBadge(recent);
 }
 
-chrome.runtime.onInstalled.addListener(rebuildContextMenus);
-chrome.runtime.onStartup.addListener(rebuildContextMenus);
+chrome.runtime.onInstalled.addListener(restoreState);
+chrome.runtime.onStartup.addListener(restoreState);
 
 async function rebuildContextMenus(): Promise<void> {
   await chrome.contextMenus.removeAll();
@@ -108,10 +140,23 @@ async function rebuildContextMenus(): Promise<void> {
   } else {
     top.forEach((c, i) => {
       const when = new Date(c.savedAt).toLocaleString();
+      const entryId = `tab-saver-entry-${i}`;
       chrome.contextMenus.create({
-        id: `tab-saver-load-${i}`,
+        id: entryId,
         parentId: "tab-saver-root",
         title: `${when} (${c.tabs.length} tabs)`,
+        contexts: ["page", "action"],
+      });
+      chrome.contextMenus.create({
+        id: `tab-saver-open-${i}`,
+        parentId: entryId,
+        title: "Open",
+        contexts: ["page", "action"],
+      });
+      chrome.contextMenus.create({
+        id: `tab-saver-delete-${i}`,
+        parentId: entryId,
+        title: "Delete",
         contexts: ["page", "action"],
       });
     });
