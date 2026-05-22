@@ -9,7 +9,17 @@ interface Storage {
   recent?: Collection[];
 }
 
-chrome.action.onClicked.addListener(async () => {
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === "save-tabs") {
+    saveAllTabs()
+      .then((result) => sendResponse({ ok: true, ...result }))
+      .catch((err) => sendResponse({ ok: false, error: String(err) }));
+    return true;
+  }
+  return false;
+});
+
+async function saveAllTabs(): Promise<{ saved: boolean; count: number }> {
   const tabs = await chrome.tabs.query({});
   const collection: Collection = {
     savedAt: new Date().toISOString(),
@@ -18,13 +28,14 @@ chrome.action.onClicked.addListener(async () => {
 
   const { recent = [] } = (await chrome.storage.local.get("recent")) as Storage;
   const updated = nextRecent(recent, collection);
-  if (!updated) return;
+  if (!updated) return { saved: false, count: collection.tabs.length };
   await chrome.storage.local.set({ recent: updated });
 
   await rebuildContextMenus();
   await flashSaveBadge(updated);
   showSaveNotification(collection.tabs.length);
-});
+  return { saved: true, count: collection.tabs.length };
+}
 
 async function updateBadge(recent: Collection[]): Promise<void> {
   const latest = recent[0];

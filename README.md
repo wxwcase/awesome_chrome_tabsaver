@@ -8,10 +8,11 @@ The source is `background.ts` (with helpers in `lib.ts`); it compiles to `backgr
 
 ## Features
 
-- **One-click save across all windows.** Click the toolbar icon to capture every tab in every Chrome window into a single collection. Each captured tab records its URL, title, and original window. A desktop notification confirms the save.
+- **Save from the toolbar popup.** Click the toolbar icon to open a small popup with a "Save all tabs" button at the top. One click captures every tab in every Chrome window into a single collection (URL, title, original window). A desktop notification confirms the save and the badge updates.
 - **Persistent badge with the latest count.** A blue badge on the toolbar icon shows the number of tabs in your **most recent** saved collection. It survives browser restarts and updates whenever you save, delete, or clear. Right after a save the badge briefly flashes **green** for 3 seconds, then settles back to blue.
 - **Skip duplicate saves.** If your tab list (URLs and order) is identical to the most recent saved collection, the click is a no-op — no new entry, no notification. Repeated clicks won't pollute history.
 - **Right-click to manage a collection.** The "Load tab collection" submenu lists your **3 most recent** snapshots (most recent first), each labeled with its save timestamp and tab count. Each entry expands into an **Open** / **Delete** submenu — Open reopens the URLs as new windows (**preserving the original multi-window grouping**, so a save that spanned three windows reopens as three windows); Delete removes just that entry from storage.
+- **Search active tabs from the popup.** The same toolbar popup includes a search input that filters your **currently open** tabs by title or URL (case-insensitive substring). Results group by Chrome window and offer **Switch** (focus that tab + window) or **Close** (close that tab) per result. Useful when you have dozens of tabs across multiple windows and need to jump to a specific one without scanning visually.
 - **One-click clear.** Right-click the extension **icon** → "Clear all saved tab collections (N)" wipes every saved collection and clears the badge. The menu item is disabled when there's nothing to clear.
 - **Storage caps.** Up to **1000 collections** are kept, and the entire `recent` array is trimmed (oldest first) to stay under **~1 MiB** when serialized. The most recent save is always kept, even if it would push you over the limit.
 - **Visible storage location.** The post-save notification tells you that data lives in `chrome.storage.local` (browser-internal, not a regular file) and includes the on-disk path Chrome uses on macOS. Useful when you're wondering "where did that go?"
@@ -84,7 +85,8 @@ After every build, click the circular reload icon on the extension's card at `ch
 
 ## Usage
 
-- **Save** — click the toolbar icon. Every tab in every Chrome window is captured into a single collection. The toolbar badge flashes green for 3 seconds with the new collection's tab count, then settles back to blue. A desktop notification confirms the save and points to where the data lives (`chrome.storage.local`, browser-internal — not a regular file). If the URL list (in order) is identical to your most recent save, nothing new is recorded.
+- **Save** — click the toolbar icon to open the popup, then click **Save all tabs**. Every tab in every Chrome window is captured into a single collection. The toolbar badge flashes green for 3 seconds with the new collection's tab count, then settles back to blue. A desktop notification confirms the save and points to where the data lives (`chrome.storage.local`, browser-internal — not a regular file). If the URL list (in order) is identical to your most recent save, the button shows "Already saved" and nothing new is recorded.
+- **Search active tabs** — the popup's search input filters your currently open tabs by title or URL. Results group by window. **Switch** focuses that tab in its window; **Close** closes the tab.
 - **Reopen** — right-click anywhere on a page (or on the extension icon) → **Load tab collection** → pick a snapshot → **Open**. URLs are reopened grouped by their original window, so a multi-window save round-trips as multiple windows.
 - **Delete one entry** — same path: **Load tab collection** → pick a snapshot → **Delete**. Removes only that entry; the badge updates to the new most-recent collection's count (or clears if nothing's left).
 - **Clear all** — right-click the extension **icon** (action menu only) → **Clear all saved tab collections (N)**. One click wipes every saved collection and clears the badge.
@@ -96,12 +98,15 @@ After every build, click the circular reload icon on the extension's card at `ch
 ```
 tab-saver/
 ├── manifest.json              ← Chrome extension manifest (MV3)
+├── popup.html                 ← Toolbar popup (Save button + active-tab search)
 ├── src/
-│   ├── background.ts          ← Service-worker entry: chrome.* listeners, menu rebuild, badge
-│   ├── lib.ts                 ← Pure helpers (sameUrls, trim, nextRecent, …)
+│   ├── background.ts          ← Service-worker entry: chrome.* listeners, menu rebuild, badge, save handler
+│   ├── popup.ts               ← Popup UI (renders open tabs, filters, switch/close)
+│   ├── lib.ts                 ← Pure helpers (sameUrls, trim, nextRecent, matchesQuery, …)
 │   └── __tests__/lib.spec.ts  ← Vitest tests for lib.ts
 ├── dist/                      ← Compiled output. Loaded by Chrome. Don't edit by hand.
 │   ├── background.js
+│   ├── popup.js
 │   └── lib.js
 ├── assets/
 │   ├── icon.png               ← Toolbar icon (referenced by manifest.json)

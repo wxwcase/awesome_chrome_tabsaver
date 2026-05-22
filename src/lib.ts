@@ -36,3 +36,42 @@ export function nextRecent(
   if (prev[0] && sameUrls(prev[0].tabs, candidate.tabs)) return null;
   return trim([candidate, ...prev]);
 }
+
+export interface SearchHit {
+  collectionIndex: number;
+  tabIndex: number;
+  savedAt: string;
+  collectionSize: number;
+  tab: SavedTab;
+}
+
+export function searchTabs(recent: Collection[], query: string): SearchHit[] {
+  const q = query.trim().toLowerCase();
+  if (q === "") return [];
+  const hits: SearchHit[] = [];
+  recent.forEach((c, ci) => {
+    c.tabs.forEach((t, ti) => {
+      if (matchesQuery(t, q)) {
+        hits.push({
+          collectionIndex: ci,
+          tabIndex: ti,
+          savedAt: c.savedAt,
+          collectionSize: c.tabs.length,
+          tab: t,
+        });
+      }
+    });
+  });
+  return hits;
+}
+
+export function matchesQuery(
+  tab: { url?: string; title?: string },
+  query: string,
+): boolean {
+  const q = query.trim().toLowerCase();
+  if (q === "") return false;
+  const title = tab.title?.toLowerCase() ?? "";
+  const url = tab.url?.toLowerCase() ?? "";
+  return title.includes(q) || url.includes(q);
+}
