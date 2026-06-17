@@ -54,7 +54,7 @@ async function handleSave(): Promise<void> {
 function render(query: string): void {
   const q = query.trim();
   if (q === "") {
-    results.innerHTML = `<div class="hint">Type to search across your currently open tabs.</div>`;
+    results.replaceChildren();
     return;
   }
   const hits = tabs.filter((t) => matchesQuery({ title: t.title, url: t.url }, q));
@@ -70,31 +70,27 @@ function render(query: string): void {
     groups.set(t.windowId, list);
   }
 
-  const frag = document.createDocumentFragment();
+  const list = document.createElement("div");
+  list.className = "list";
   let i = 1;
   for (const [windowId, groupHits] of groups) {
-    frag.appendChild(renderGroup(`Window ${i++}`, windowId, groupHits, q));
+    list.appendChild(renderDivider(`Window ${i++}`, windowId, groupHits.length));
+    for (const t of groupHits) {
+      list.appendChild(renderRow(t, q));
+    }
   }
-  results.replaceChildren(frag);
+  results.replaceChildren(list);
 }
 
-function renderGroup(label: string, windowId: number, hits: chrome.tabs.Tab[], q: string): HTMLElement {
-  const wrap = document.createElement("div");
-  wrap.className = "group";
-
-  const header = document.createElement("div");
-  header.className = "group-header";
-  header.innerHTML = `<span class="when">${escapeHtml(label)}</span><span class="meta">${hits.length} match${hits.length === 1 ? "" : "es"}</span>`;
+function renderDivider(label: string, windowId: number, count: number): HTMLElement {
+  const divider = document.createElement("div");
+  divider.className = "divider";
+  divider.innerHTML = `<span class="when">${escapeHtml(label)}</span><span class="meta">${count} match${count === 1 ? "" : "es"}</span>`;
   const focus = document.createElement("button");
   focus.textContent = "Focus";
   focus.addEventListener("click", () => chrome.windows.update(windowId, { focused: true }));
-  header.appendChild(focus);
-  wrap.appendChild(header);
-
-  for (const t of hits) {
-    wrap.appendChild(renderRow(t, q));
-  }
-  return wrap;
+  divider.appendChild(focus);
+  return divider;
 }
 
 function renderRow(tab: chrome.tabs.Tab, q: string): HTMLElement {
