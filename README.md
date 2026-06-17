@@ -8,20 +8,6 @@ Sources are in `src/` (`background.ts`, `popup.ts`, helpers in `lib.ts`); they c
 
 > The diagram is a single-panel walk-through of the current popup: how the toolbar icon opens it, what the Save button and search input do, how clicking a result row switches to that tab while the **×** / Focus controls call into the Chrome API, and how the right-click menu still surfaces saved collections. Source SVG lives at `assets/ui-workflows.svg`.
 
-## Features
-
-- **Save from the toolbar popup.** Click the toolbar icon to open a small popup with a "Save all tabs" button at the top. One click captures every tab in every Chrome window into a single collection (URL, title, original window). A desktop notification confirms the save and the badge updates.
-- **Persistent badge with the latest count.** A blue badge on the toolbar icon shows the number of tabs in your **most recent** saved collection. It survives browser restarts and updates whenever you save, delete, or clear. Right after a save the badge briefly flashes **green** for 3 seconds, then settles back to blue.
-- **Skip duplicate saves.** If your tab list (URLs and order) is identical to the most recent saved collection, **Save all tabs** is a no-op — the button shows "Already saved", no new entry is added, and no notification fires. Repeated saves won't pollute history.
-- **Right-click to manage a collection.** The "Load tab collection" submenu lists your **3 most recent** snapshots (most recent first), each labeled with its save timestamp and tab count. Each entry expands into an **Open** / **Delete** submenu — Open reopens the URLs as new windows (**preserving the original multi-window grouping**, so a save that spanned three windows reopens as three windows); Delete removes just that entry from storage.
-- **Search active tabs from the popup.** The same toolbar popup includes a search input that filters your **currently open** tabs by title or URL (case-insensitive substring). Results are grouped into one boxed card per Chrome window (each with a **Focus** button in its header). **Click a result row** to switch to that tab and focus its window, or click the red **×** to close the tab in place. Useful when you have dozens of tabs across multiple windows and need to jump to a specific one without scanning visually.
-- **One-click clear.** Right-click the extension **icon** → "Clear all saved tab collections (N)" wipes every saved collection and clears the badge. The menu item is disabled when there's nothing to clear.
-- **Storage caps.** Up to **1000 collections** are kept, and the entire `recent` array is trimmed (oldest first) to stay under **~1 MiB** when serialized. The most recent save is always kept, even if it would push you over the limit.
-- **Visible storage location.** The post-save notification tells you that data lives in `chrome.storage.local` (browser-internal, not a regular file) and includes the on-disk path Chrome uses on macOS. Useful when you're wondering "where did that go?"
-- **Persists across browser restarts.** Collections live in `chrome.storage.local`, so they survive Chrome restarts and the MV3 service worker being suspended between clicks.
-
-> **Visibility vs. storage.** The right-click submenu only shows the 3 most recent collections, but older entries (up to the storage caps) still live in `chrome.storage.local`. They aren't surfaced in the UI today; you'd see them via DevTools or by extending the extension to render more.
-
 ## Installation
 
 This package supports two workflows. Pick whichever matches where you have it checked out:
@@ -84,6 +70,20 @@ The extension's icon should appear in the toolbar. Pin it if you want it always 
 After every build, click the circular reload icon on the extension's card at `chrome://extensions`. Service-worker logs are under the **Inspect views: service worker** link on the same card.
 
 > If you change `manifest.json` (especially `permissions`), a plain reload may not be enough — remove and re-load the unpacked extension so Chrome picks up the new permissions.
+
+## Features
+
+- **Save from the toolbar popup.** Click the toolbar icon to open a small popup with a "Save all tabs" button at the top. One click captures every tab in every Chrome window into a single collection (URL, title, original window). A desktop notification confirms the save and the badge updates.
+- **Persistent badge with the latest count.** A blue badge on the toolbar icon shows the number of tabs in your **most recent** saved collection. It survives browser restarts and updates whenever you save, delete, or clear. Right after a save the badge briefly flashes **green** for 3 seconds, then settles back to blue.
+- **Skip duplicate saves.** If your tab list (URLs and order) is identical to the most recent saved collection, **Save all tabs** is a no-op — the button shows "Already saved", no new entry is added, and no notification fires. Repeated saves won't pollute history.
+- **Right-click to manage a collection.** The "Load tab collection" submenu lists your **3 most recent** snapshots (most recent first), each labeled with its save timestamp and tab count. Each entry expands into an **Open** / **Delete** submenu — Open reopens the URLs as new windows (**preserving the original multi-window grouping**, so a save that spanned three windows reopens as three windows); Delete removes just that entry from storage.
+- **Search active tabs from the popup.** The same toolbar popup includes a search input that filters your **currently open** tabs by title or URL (case-insensitive substring). Results are grouped into one boxed card per Chrome window (each with a **Focus** button in its header). **Click a result row** to switch to that tab and focus its window, or click the red **×** to close the tab in place. Useful when you have dozens of tabs across multiple windows and need to jump to a specific one without scanning visually.
+- **One-click clear.** Right-click the extension **icon** → "Clear all saved tab collections (N)" wipes every saved collection and clears the badge. The menu item is disabled when there's nothing to clear.
+- **Storage caps.** Up to **1000 collections** are kept, and the entire `recent` array is trimmed (oldest first) to stay under **~1 MiB** when serialized. The most recent save is always kept, even if it would push you over the limit.
+- **Visible storage location.** The post-save notification tells you that data lives in `chrome.storage.local` (browser-internal, not a regular file) and includes the on-disk path Chrome uses on macOS. Useful when you're wondering "where did that go?"
+- **Persists across browser restarts.** Collections live in `chrome.storage.local`, so they survive Chrome restarts and the MV3 service worker being suspended between clicks.
+
+> **Visibility vs. storage.** The right-click submenu only shows the 3 most recent collections, but older entries (up to the storage caps) still live in `chrome.storage.local`. They aren't surfaced in the UI today; you'd see them via DevTools or by extending the extension to render more.
 
 ## Usage
 

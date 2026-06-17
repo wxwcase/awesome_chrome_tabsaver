@@ -4,15 +4,24 @@ const input = document.getElementById("q") as HTMLInputElement;
 const results = document.getElementById("results") as HTMLDivElement;
 const sub = document.getElementById("sub") as HTMLParagraphElement;
 const saveBtn = document.getElementById("save") as HTMLButtonElement;
+const showAllBtn = document.getElementById("show-all") as HTMLButtonElement;
 
 let tabs: chrome.tabs.Tab[] = [];
+let showAll = false;
 
 (async () => {
   await refresh();
 })();
 
-input.addEventListener("input", () => render(input.value));
+input.addEventListener("input", () => {
+  showAll = false;
+  render(input.value);
+});
 saveBtn.addEventListener("click", handleSave);
+showAllBtn.addEventListener("click", () => {
+  showAll = true;
+  render(input.value);
+});
 
 chrome.tabs.onCreated.addListener(refresh);
 chrome.tabs.onRemoved.addListener(refresh);
@@ -53,11 +62,11 @@ async function handleSave(): Promise<void> {
 
 function render(query: string): void {
   const q = query.trim();
-  if (q === "") {
+  if (q === "" && !showAll) {
     results.replaceChildren();
     return;
   }
-  const hits = tabs.filter((t) => matchesQuery({ title: t.title, url: t.url }, q));
+  const hits = showAll || q === "" ? tabs.slice() : tabs.filter((t) => matchesQuery({ title: t.title, url: t.url }, q));
   if (hits.length === 0) {
     results.innerHTML = `<div class="empty">No open tabs match "${escapeHtml(q)}".</div>`;
     return;
@@ -73,6 +82,7 @@ function render(query: string): void {
   const frag = document.createDocumentFragment();
   let i = 1;
   for (const [windowId, groupHits] of groups) {
+    groupHits.sort((a, b) => (a.title ?? "").localeCompare(b.title ?? "", undefined, { sensitivity: "base" }));
     frag.appendChild(renderGroup(`Window ${i++}`, windowId, groupHits, q));
   }
   results.replaceChildren(frag);
