@@ -96,6 +96,12 @@ function renderDivider(label: string, windowId: number, count: number): HTMLElem
 function renderRow(tab: chrome.tabs.Tab, q: string): HTMLElement {
   const row = document.createElement("div");
   row.className = "row";
+  row.title = "Switch to this tab";
+  row.addEventListener("click", async () => {
+    if (tab.id == null) return;
+    await chrome.tabs.update(tab.id, { active: true });
+    await chrome.windows.update(tab.windowId, { focused: true });
+  });
 
   const left = document.createElement("div");
   const titleEl = document.createElement("div");
@@ -110,23 +116,17 @@ function renderRow(tab: chrome.tabs.Tab, q: string): HTMLElement {
   const actions = document.createElement("div");
   actions.className = "actions";
 
-  const switchBtn = document.createElement("button");
-  switchBtn.textContent = "Switch";
-  switchBtn.addEventListener("click", async () => {
-    if (tab.id == null) return;
-    await chrome.tabs.update(tab.id, { active: true });
-    await chrome.windows.update(tab.windowId, { focused: true });
-  });
-
   const closeBtn = document.createElement("button");
-  closeBtn.className = "danger";
-  closeBtn.textContent = "Close";
-  closeBtn.addEventListener("click", async () => {
+  closeBtn.className = "danger close";
+  closeBtn.textContent = "×";
+  closeBtn.title = "Close tab";
+  closeBtn.setAttribute("aria-label", "Close tab");
+  closeBtn.addEventListener("click", async (e) => {
+    e.stopPropagation();
     if (tab.id == null) return;
     await chrome.tabs.remove(tab.id);
   });
 
-  actions.appendChild(switchBtn);
   actions.appendChild(closeBtn);
 
   row.appendChild(left);
