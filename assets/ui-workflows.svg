@@ -25,7 +25,7 @@
 
   <!-- Title -->
   <text x="720" y="46" text-anchor="middle" font-size="28" font-weight="700" fill="#202124">Tab Saver — UI workflow</text>
-  <text x="720" y="72" text-anchor="middle" font-size="14" fill="#5f6368">Click the toolbar icon to open the popup. Save all tabs, search active tabs, switch or close any match.</text>
+  <text x="720" y="72" text-anchor="middle" font-size="14" fill="#5f6368">Click the toolbar icon to open the popup. Save all tabs, search active tabs, click a match to switch or × to close.</text>
 
   <!-- Panel -->
   <g transform="translate(40,100)">
@@ -100,10 +100,7 @@
         <rect x="22" y="152" width="78" height="14" rx="2" fill="#fff3a3"/>
         <text x="22" y="163" font-size="12" fill="#202124"><tspan font-weight="600">[MCF Export]</tspan> Tasks</text>
         <text x="22" y="178" font-size="10" fill="#5f6368">https://issues.amazon.com/issues/SBWFT-17223</text>
-        <rect x="296" y="156" width="50" height="20" rx="3" fill="#fff" stroke="#3367d6"/>
-        <text x="321" y="170" text-anchor="middle" font-size="10" fill="#3367d6">Switch</text>
-        <rect x="350" y="156" width="50" height="20" rx="3" fill="#fff" stroke="#d93025"/>
-        <text x="375" y="170" text-anchor="middle" font-size="10" fill="#d93025">Close</text>
+        <text x="384" y="171" text-anchor="middle" font-size="16" font-weight="700" fill="#d93025">×</text>
         <line x1="22" y1="190" x2="398" y2="190" stroke="#eef0f3"/>
 
         <!-- Row 2 -->
@@ -111,10 +108,7 @@
         <text x="22" y="211" font-size="12" fill="#202124"><tspan font-weight="600">[MCF Export]</tspan> Gate intl order injection behind</text>
         <text x="22" y="226" font-size="12" fill="#202124">Weblab</text>
         <text x="22" y="242" font-size="10" fill="#5f6368">https://issues.amazon.com/issues/MERC-10357</text>
-        <rect x="296" y="212" width="50" height="20" rx="3" fill="#fff" stroke="#3367d6"/>
-        <text x="321" y="226" text-anchor="middle" font-size="10" fill="#3367d6">Switch</text>
-        <rect x="350" y="212" width="50" height="20" rx="3" fill="#fff" stroke="#d93025"/>
-        <text x="375" y="226" text-anchor="middle" font-size="10" fill="#d93025">Close</text>
+        <text x="384" y="227" text-anchor="middle" font-size="16" font-weight="700" fill="#d93025">×</text>
 
         <!-- Group: Window 2 -->
         <rect x="12" y="278" width="396" height="100" rx="8" fill="#fff" stroke="#dadce0"/>
@@ -126,10 +120,7 @@
         <rect x="22" y="310" width="78" height="14" rx="2" fill="#fff3a3"/>
         <text x="22" y="321" font-size="12" fill="#202124"><tspan font-weight="600">[MCF Export]</tspan> Tasks</text>
         <text x="22" y="336" font-size="10" fill="#5f6368">https://issues.amazon.com/issues/SBWFT-17223</text>
-        <rect x="296" y="314" width="50" height="20" rx="3" fill="#fff" stroke="#3367d6"/>
-        <text x="321" y="328" text-anchor="middle" font-size="10" fill="#3367d6">Switch</text>
-        <rect x="350" y="314" width="50" height="20" rx="3" fill="#fff" stroke="#d93025"/>
-        <text x="375" y="328" text-anchor="middle" font-size="10" fill="#d93025">Close</text>
+        <text x="384" y="329" text-anchor="middle" font-size="16" font-weight="700" fill="#d93025">×</text>
 
         <text x="210" y="408" text-anchor="middle" font-size="10" fill="#9aa0a6">Live results from chrome.tabs.query —</text>
         <text x="210" y="422" text-anchor="middle" font-size="10" fill="#9aa0a6">refreshes on tab create / close / URL change</text>
@@ -154,15 +145,13 @@
 
         <g transform="translate(0,66)">
           <rect width="510" height="36" fill="#fff"/>
-          <rect x="10" y="10" width="60" height="18" rx="3" fill="#fff" stroke="#3367d6"/>
-          <text x="40" y="23" text-anchor="middle" font-size="10" fill="#3367d6">Switch</text>
+          <text x="10" y="23" font-size="11" font-weight="500" fill="#3c4043">Click tab row</text>
           <text x="200" y="28">tabs.update(id, {active}) + windows.update(focused).</text>
         </g>
 
         <g transform="translate(0,102)">
           <rect width="510" height="36" fill="#fafbfc"/>
-          <rect x="10" y="10" width="60" height="18" rx="3" fill="#fff" stroke="#d93025"/>
-          <text x="40" y="23" text-anchor="middle" font-size="10" fill="#d93025">Close</text>
+          <text x="35" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#d93025">×</text>
           <text x="200" y="28">tabs.remove(id). The popup re-queries and updates.</text>
         </g>
 

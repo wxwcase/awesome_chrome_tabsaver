@@ -70,27 +70,31 @@ function render(query: string): void {
     groups.set(t.windowId, list);
   }
 
-  const list = document.createElement("div");
-  list.className = "list";
+  const frag = document.createDocumentFragment();
   let i = 1;
   for (const [windowId, groupHits] of groups) {
-    list.appendChild(renderDivider(`Window ${i++}`, windowId, groupHits.length));
-    for (const t of groupHits) {
-      list.appendChild(renderRow(t, q));
-    }
+    frag.appendChild(renderGroup(`Window ${i++}`, windowId, groupHits, q));
   }
-  results.replaceChildren(list);
+  results.replaceChildren(frag);
 }
 
-function renderDivider(label: string, windowId: number, count: number): HTMLElement {
-  const divider = document.createElement("div");
-  divider.className = "divider";
-  divider.innerHTML = `<span class="when">${escapeHtml(label)}</span><span class="meta">${count} match${count === 1 ? "" : "es"}</span>`;
+function renderGroup(label: string, windowId: number, hits: chrome.tabs.Tab[], q: string): HTMLElement {
+  const group = document.createElement("div");
+  group.className = "group";
+
+  const header = document.createElement("div");
+  header.className = "group-header";
+  header.innerHTML = `<span class="when">${escapeHtml(label)}</span><span class="meta">${hits.length} match${hits.length === 1 ? "" : "es"}</span>`;
   const focus = document.createElement("button");
   focus.textContent = "Focus";
   focus.addEventListener("click", () => chrome.windows.update(windowId, { focused: true }));
-  divider.appendChild(focus);
-  return divider;
+  header.appendChild(focus);
+  group.appendChild(header);
+
+  for (const t of hits) {
+    group.appendChild(renderRow(t, q));
+  }
+  return group;
 }
 
 function renderRow(tab: chrome.tabs.Tab, q: string): HTMLElement {
