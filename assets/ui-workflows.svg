@@ -78,16 +78,20 @@
         <text x="210" y="34" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Save all tabs</text>
 
         <!-- Search input -->
-        <rect x="12" y="58" width="396" height="32" rx="6" fill="#fafbfc" stroke="#dadce0"/>
+        <rect x="12" y="58" width="296" height="32" rx="6" fill="#fafbfc" stroke="#dadce0"/>
         <circle cx="28" cy="74" r="5" fill="none" stroke="#5f6368" stroke-width="1.4"/>
         <line x1="32" y1="78" x2="36" y2="82" stroke="#5f6368" stroke-width="1.4"/>
         <text x="44" y="78" font-size="12" fill="#202124">[MCF Export]</text>
-        <g transform="translate(388,74)" stroke="#5f6368" stroke-width="1.4" stroke-linecap="round">
+        <g transform="translate(294,74)" stroke="#5f6368" stroke-width="1.4" stroke-linecap="round">
           <line x1="-4" y1="-4" x2="4" y2="4"/>
           <line x1="4" y1="-4" x2="-4" y2="4"/>
         </g>
 
-        <text x="14" y="108" font-size="11" fill="#5f6368">189 open tabs across 10 windows.</text>
+        <!-- Show all tabs button -->
+        <rect x="316" y="58" width="92" height="32" rx="6" fill="#e8f0fe" stroke="#dadce0"/>
+        <text x="362" y="78" text-anchor="middle" font-size="12" font-weight="600" fill="#3367d6">Show all tabs</text>
+
+        <text x="396" y="108" text-anchor="end" font-size="12" fill="#5f6368">189 open tabs across 10 windows.</text>
 
         <!-- Group: Window 1 -->
         <rect x="12" y="120" width="396" height="148" rx="8" fill="#fff" stroke="#dadce0"/>
@@ -145,32 +149,39 @@
 
         <g transform="translate(0,66)">
           <rect width="510" height="36" fill="#fff"/>
-          <text x="10" y="23" font-size="11" font-weight="500" fill="#3c4043">Click tab row</text>
-          <text x="200" y="28">tabs.update(id, {active}) + windows.update(focused).</text>
+          <rect x="10" y="9" width="86" height="20" rx="3" fill="#e8f0fe" stroke="#dadce0"/>
+          <text x="53" y="23" text-anchor="middle" font-size="10" font-weight="600" fill="#3367d6">Show all tabs</text>
+          <text x="200" y="28">Lists every open tab, grouped by window — even with text in search.</text>
         </g>
 
         <g transform="translate(0,102)">
           <rect width="510" height="36" fill="#fafbfc"/>
-          <text x="35" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#d93025">×</text>
-          <text x="200" y="28">tabs.remove(id). The popup re-queries and updates.</text>
+          <text x="10" y="23" font-size="11" font-weight="500" fill="#3c4043">Click tab row</text>
+          <text x="200" y="28">tabs.update(id, {active}) + windows.update(focused).</text>
         </g>
 
         <g transform="translate(0,138)">
           <rect width="510" height="36" fill="#fff"/>
+          <text x="35" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#d93025">×</text>
+          <text x="200" y="28">tabs.remove(id). The popup re-queries and updates.</text>
+        </g>
+
+        <g transform="translate(0,174)">
+          <rect width="510" height="36" fill="#fafbfc"/>
           <text x="10" y="23" font-size="11" font-weight="500" fill="#3367d6">Focus</text>
           <text x="200" y="28">windows.update(windowId, {focused: true}).</text>
         </g>
 
-        <g transform="translate(0,174)">
-          <rect width="510" height="44" fill="#fafbfc"/>
+        <g transform="translate(0,210)">
+          <rect width="510" height="44" fill="#fff"/>
           <text x="10" y="20" font-weight="600">Search input</text>
           <text x="10" y="36" font-size="11" fill="#5f6368">(top of popup)</text>
-          <text x="200" y="20">matchesQuery(): case-insensitive substring</text>
-          <text x="200" y="36">on title or URL. Re-runs on every keystroke.</text>
+          <text x="200" y="20">matchesQuery(): case-insensitive substring on title</text>
+          <text x="200" y="36">or URL. Results sorted by title within each window.</text>
         </g>
 
-        <g transform="translate(0,222)">
-          <rect width="510" height="44" fill="#fff"/>
+        <g transform="translate(0,254)">
+          <rect width="510" height="44" fill="#fafbfc"/>
           <text x="10" y="20" font-weight="600">Right-click</text>
           <text x="10" y="36" font-size="11" fill="#5f6368">(icon or page)</text>
           <text x="200" y="20">Load tab collection ▸ {savedAt} ▸ Open / Delete</text>
@@ -178,7 +189,7 @@
         </g>
       </g>
 
-      <g transform="translate(0,310)">
+      <g transform="translate(0,346)">
         <text x="0" y="0" font-size="13" font-weight="700" fill="#3c4043">Notes</text>
         <g font-size="11" fill="#5f6368">
           <text x="0" y="22">• Save flashes the badge GREEN with the new count, then settles to BLUE for ~3s.</text>
