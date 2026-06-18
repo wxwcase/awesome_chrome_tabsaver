@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Saver",
+  "version": "1.0.0",
+  "description": "Save all open tabs and reload recent collections from the right-click menu.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "contextMenus",
+    "notifications"
+  ],
+  "background": {
+    "service_worker": "dist/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Tab Saver",
+    "default_icon": "assets/icon.png",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "128": "assets/icon.png"
+  }
+}

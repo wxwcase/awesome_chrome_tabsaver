@@ -1,0 +1,35 @@
+{
+  "name": "awesome-chrome-tab-saver",
+  "version": "0.1.0",
+  "license": "UNLICENSED",
+  "repository": "https://github.com/wxwcase/awesome_chrome_tabsaver",
+  "homepage": "https://github.com/wxwcase/awesome_chrome_tabsaver/blob/main/README.md",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "clean": "rm -rf dist && rm -rf node_modules",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prepublishOnly": "npm run build && npm run test",
+    "test": "vitest run --coverage",
+    "posttest": "generate-coverage-data --language typescript"
+  },
+  "files": [
+    "manifest.json",
+    "popup.html",
+    "assets/",
+    "dist/"
+  ],
+  "npm-pretty-much": {
+    "runTest": "never"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "^24.0.4",
+    "@types/chrome": "^0.0.270",
+    "@vitest/coverage-v8": "^4.1.2",
+    "typescript": "~6.0.2",
+    "vitest": "^4.1.2"
+  }
+}
