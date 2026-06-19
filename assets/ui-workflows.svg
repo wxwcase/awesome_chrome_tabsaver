@@ -25,7 +25,7 @@
 
   <!-- Title -->
   <text x="720" y="46" text-anchor="middle" font-size="28" font-weight="700" fill="#202124">Tab Saver — UI workflow</text>
-  <text x="720" y="72" text-anchor="middle" font-size="14" fill="#5f6368">Click the toolbar icon to open the popup. Save all tabs, search active tabs, click a match to switch or × to close.</text>
+  <text x="720" y="72" text-anchor="middle" font-size="14" fill="#5f6368">Click the toolbar icon to open the popup. Group tabs by domain, save all tabs, search active tabs, click a match to switch or × to close.</text>
 
   <!-- Panel -->
   <g transform="translate(40,100)">
@@ -73,9 +73,11 @@
       <g transform="translate(0,16)">
         <rect width="420" height="500" rx="10" fill="#fff" stroke="#dadce0"/>
 
-        <!-- Save button -->
-        <rect x="12" y="12" width="396" height="36" rx="6" fill="#3367d6"/>
-        <text x="210" y="34" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Save all tabs</text>
+        <!-- Save all tabs button (primary, left, aligned with search box) + Group tabs button (soft, right, aligned with Show all tabs) -->
+        <rect x="12" y="12" width="296" height="36" rx="6" fill="#3367d6"/>
+        <text x="160" y="34" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Save all tabs</text>
+        <rect x="316" y="12" width="92" height="36" rx="6" fill="#e8f0fe" stroke="#dadce0"/>
+        <text x="362" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="#3367d6">Group tabs</text>
 
         <!-- Search input -->
         <rect x="12" y="58" width="296" height="32" rx="6" fill="#fafbfc" stroke="#dadce0"/>
@@ -131,39 +133,46 @@
         <text x="200" y="15" font-weight="600">Effect</text>
 
         <g transform="translate(0,22)">
-          <rect width="510" height="44" fill="#fafbfc"/>
+          <rect width="510" height="36" fill="#fafbfc"/>
+          <rect x="10" y="9" width="80" height="20" rx="3" fill="#e8f0fe" stroke="#dadce0"/>
+          <text x="50" y="23" text-anchor="middle" font-size="10" font-weight="600" fill="#3367d6">Group tabs</text>
+          <text x="200" y="28">Groups the active window's tabs into Chrome tab groups by domain (A→Z).</text>
+        </g>
+
+        <g transform="translate(0,58)">
+          <rect width="510" height="44" fill="#fff"/>
           <rect x="10" y="12" width="80" height="20" rx="3" fill="#3367d6"/>
           <text x="50" y="26" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Save all tabs</text>
           <text x="200" y="20">Sends {type:"save-tabs"} to service worker.</text>
           <text x="200" y="36">Dedups against most recent; flashes badge green.</text>
         </g>
 
-        <g transform="translate(0,66)">
+        <g transform="translate(0,102)">
           <rect width="510" height="36" fill="#fff"/>
           <rect x="10" y="9" width="86" height="20" rx="3" fill="#e8f0fe" stroke="#dadce0"/>
           <text x="53" y="23" text-anchor="middle" font-size="10" font-weight="600" fill="#3367d6">Show all tabs</text>
           <text x="200" y="28">Lists every open tab, grouped by window — even with text in search.</text>
         </g>
 
-        <g transform="translate(0,102)">
+        <g transform="translate(0,138)">
           <rect width="510" height="36" fill="#fafbfc"/>
           <text x="10" y="23" font-size="11" font-weight="500" fill="#3c4043">Click tab row</text>
           <text x="200" y="28">tabs.update(id, {active}) + windows.update(focused).</text>
         </g>
 
-        <g transform="translate(0,138)">
+        <g transform="translate(0,174)">
           <rect width="510" height="36" fill="#fff"/>
           <text x="35" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#d93025">×</text>
           <text x="200" y="28">tabs.remove(id). The popup re-queries and updates.</text>
         </g>
 
-        <g transform="translate(0,174)">
+        <g transform="translate(0,210)">
           <rect width="510" height="36" fill="#fafbfc"/>
           <text x="10" y="23" font-size="11" font-weight="500" fill="#3367d6">Focus</text>
           <text x="200" y="28">windows.update(windowId, {focused: true}).</text>
         </g>
 
-        <g transform="translate(0,210)">
+        <g transform="translate(0,246)">
           <rect width="510" height="44" fill="#fff"/>
           <text x="10" y="20" font-weight="600">Search input</text>
           <text x="10" y="36" font-size="11" fill="#5f6368">(top of popup)</text>
@@ -171,7 +180,7 @@
           <text x="200" y="36">or URL. Results sorted by title within each window.</text>
         </g>
 
-        <g transform="translate(0,254)">
+        <g transform="translate(0,290)">
           <rect width="510" height="44" fill="#fafbfc"/>
           <text x="10" y="20" font-weight="600">Right-click</text>
           <text x="10" y="36" font-size="11" fill="#5f6368">(icon or page)</text>
@@ -180,7 +189,7 @@
         </g>
       </g>
 
-      <g transform="translate(0,346)">
+      <g transform="translate(0,382)">
         <text x="0" y="0" font-size="13" font-weight="700" fill="#3c4043">Notes</text>
         <g font-size="11" fill="#5f6368">
           <text x="0" y="22">• Save flashes the badge GREEN with the new count, then settles to BLUE for ~3s.</text>

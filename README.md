@@ -1,10 +1,10 @@
 # Tab Saver
 
-Chrome extension (Manifest V3). Click the toolbar icon to open a popup that lets you save every open tab across every Chrome window, search your currently open tabs (click a result to switch, or the **×** to close it), or jump to the right-click "Load tab collection" submenu to reopen a saved snapshot.
+Chrome extension (Manifest V3). Click the toolbar icon to open a popup that lets you save every open tab across every Chrome window, group the active window's tabs into Chrome tab groups by domain, search your currently open tabs (click a result to switch, or the **×** to close it), or jump to the right-click "Load tab collection" submenu to reopen a saved snapshot.
 
 Sources are in `src/` (`background.ts`, `popup.ts`, helpers in `lib.ts`); they compile to `dist/*.js`, which is what Chrome actually loads. There's no bundler — just `tsc`.
 
-![Tab Saver UI workflow: toolbar icon opens a popup with Save all tabs, active-tab search, click-to-switch results with a × close per row, and a control reference](assets/ui-workflows.jpg)
+![Tab Saver UI workflow: toolbar icon opens a popup with Save all tabs and Group tabs, active-tab search, click-to-switch results with a × close per row, and a control reference](assets/ui-workflows.jpg)
 
 > The diagram is a single-panel walk-through of the current popup: how the toolbar icon opens it, what the Save button and search input do, how clicking a result row switches to that tab while the **×** / Focus controls call into the Chrome API, and how the right-click menu still surfaces saved collections. Source SVG lives at `assets/ui-workflows.svg`.
 
@@ -47,6 +47,7 @@ After every build, click the circular reload icon on the extension's card at `ch
 ## Features
 
 - **Save from the toolbar popup.** Click the toolbar icon to open a small popup with a "Save all tabs" button at the top. One click captures every tab in every Chrome window into a single collection (URL, title, original window). A desktop notification confirms the save and the badge updates.
+- **Group active-window tabs by domain.** A **Group tabs** button sits to the right of "Save all tabs". One click sorts the **current window's** unpinned tabs into native Chrome tab groups — one group per domain (with `www.` stripped, so `www.github.com` and `github.com` merge), arranged alphabetically left-to-right and titled with the domain. The button briefly shows how many domains were grouped. Pinned tabs and non-web URLs (e.g. `chrome://`, `about:blank`) are left ungrouped. Grouping is idempotent: domains already correctly grouped (one group, matching title, exactly those tabs) are skipped so existing group colors and collapsed state are preserved — the button shows "Already grouped" when there's nothing to do.
 - **Persistent badge with the latest count.** A blue badge on the toolbar icon shows the number of tabs in your **most recent** saved collection. It survives browser restarts and updates whenever you save, delete, or clear. Right after a save the badge briefly flashes **green** for 3 seconds, then settles back to blue.
 - **Skip duplicate saves.** If your tab list (URLs and order) is identical to the most recent saved collection, **Save all tabs** is a no-op — the button shows "Already saved", no new entry is added, and no notification fires. Repeated saves won't pollute history.
 - **Right-click to manage a collection.** The "Load tab collection" submenu lists your **3 most recent** snapshots (most recent first), each labeled with its save timestamp and tab count. Each entry expands into an **Open** / **Delete** submenu — Open reopens the URLs as new windows (**preserving the original multi-window grouping**, so a save that spanned three windows reopens as three windows); Delete removes just that entry from storage.
@@ -61,6 +62,7 @@ After every build, click the circular reload icon on the extension's card at `ch
 ## Usage
 
 - **Save** — click the toolbar icon to open the popup, then click **Save all tabs**. Every tab in every Chrome window is captured into a single collection. The toolbar badge flashes green for 3 seconds with the new collection's tab count, then settles back to blue. A desktop notification confirms the save and points to where the data lives (`chrome.storage.local`, browser-internal — not a regular file). If the URL list (in order) is identical to your most recent save, the button shows "Already saved" and nothing new is recorded.
+- **Group tabs** — click **Group tabs** (right of "Save all tabs") to sort the current window's unpinned tabs into native Chrome tab groups by domain, ordered alphabetically. The button confirms with the number of domains grouped, or "Already grouped" if nothing changed.
 - **Search active tabs** — the popup's search input filters your currently open tabs by title or URL. Results are grouped into one boxed card per Chrome window. Click a result row to switch to that tab in its window; click the red **×** to close the tab.
 - **Reopen** — right-click anywhere on a page (or on the extension icon) → **Load tab collection** → pick a snapshot → **Open**. URLs are reopened grouped by their original window, so a multi-window save round-trips as multiple windows.
 - **Delete one entry** — same path: **Load tab collection** → pick a snapshot → **Delete**. Removes only that entry; the badge updates to the new most-recent collection's count (or clears if nothing's left).
@@ -73,7 +75,7 @@ After every build, click the circular reload icon on the extension's card at `ch
 ```
 tab-saver/
 ├── manifest.json              ← Chrome extension manifest (MV3)
-├── popup.html                 ← Toolbar popup (Save button + active-tab search)
+├── popup.html                 ← Toolbar popup (Group + Save buttons + active-tab search)
 ├── src/
 │   ├── background.ts          ← Service-worker entry: chrome.* listeners, menu rebuild, badge, save handler
 │   ├── popup.ts               ← Popup UI (renders open tabs, filters, click-to-switch / × close)

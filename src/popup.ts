@@ -1,4 +1,4 @@
-import { matchesQuery, planDomainGroups } from "./lib.js";
+import { domainGroupsToApply, matchesQuery } from "./lib.js";
 
 const input = document.getElementById("q") as HTMLInputElement;
 const results = document.getElementById("results") as HTMLDivElement;
@@ -67,13 +67,20 @@ async function handleGroup(): Promise<void> {
   const original = groupBtn.textContent;
   try {
     const winTabs = await chrome.tabs.query({ currentWindow: true, pinned: false });
-    const plan = planDomainGroups(winTabs.map((t) => ({ id: t.id, url: t.url })));
+    const existing = await chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+    const plan = domainGroupsToApply(
+      winTabs.map((t) => ({ id: t.id, url: t.url, groupId: t.groupId })),
+      existing.map((g) => ({ id: g.id, title: g.title })),
+    );
     for (const { domain, tabIds } of plan) {
       const groupId = await chrome.tabs.group({ tabIds });
       await chrome.tabGroups.update(groupId, { title: domain });
     }
     groupBtn.classList.add("grouped");
-    groupBtn.textContent = `Grouped ${plan.length} domain${plan.length === 1 ? "" : "s"}`;
+    groupBtn.textContent =
+      plan.length === 0
+        ? "Already grouped"
+        : `Grouped ${plan.length} domain${plan.length === 1 ? "" : "s"}`;
   } catch {
     groupBtn.textContent = "Group failed";
   }

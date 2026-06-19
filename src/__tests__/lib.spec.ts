@@ -3,13 +3,15 @@ import {
   byteSize,
   type Collection,
   domainFromUrl,
+  domainGroupsToApply,
   MAX_BYTES,
   matchesQuery,
   nextRecent,
   planDomainGroups,
   sameUrls,
-  searchTabs,
+  TAB_GROUP_ID_NONE,
   trim,
+  searchTabs,
 } from "../lib.js";
 
 const tab = (url: string, title = url, windowId = 1) => ({ url, title, windowId });
@@ -180,6 +182,81 @@ describe("planDomainGroups", () => {
       { id: 3, url: "https://example.com/x" },
     ]);
     expect(plan).toEqual([{ domain: "example.com", tabIds: [3] }]);
+  });
+});
+
+describe("domainGroupsToApply", () => {
+  const NONE = TAB_GROUP_ID_NONE;
+
+  it("plans all domains when nothing is grouped yet", () => {
+    const plan = domainGroupsToApply(
+      [
+        { id: 1, url: "https://github.com/a", groupId: NONE },
+        { id: 2, url: "https://example.com/x", groupId: NONE },
+      ],
+      [],
+    );
+    expect(plan).toEqual([
+      { domain: "example.com", tabIds: [2] },
+      { domain: "github.com", tabIds: [1] },
+    ]);
+  });
+
+  it("skips a domain already correctly grouped", () => {
+    const plan = domainGroupsToApply(
+      [
+        { id: 1, url: "https://github.com/a", groupId: 10 },
+        { id: 2, url: "https://github.com/b", groupId: 10 },
+      ],
+      [{ id: 10, title: "github.com" }],
+    );
+    expect(plan).toEqual([]);
+  });
+
+  it("regroups when a new tab of the domain is still ungrouped", () => {
+    const plan = domainGroupsToApply(
+      [
+        { id: 1, url: "https://github.com/a", groupId: 10 },
+        { id: 2, url: "https://github.com/b", groupId: 10 },
+        { id: 3, url: "https://github.com/c", groupId: NONE },
+      ],
+      [{ id: 10, title: "github.com" }],
+    );
+    expect(plan).toEqual([{ domain: "github.com", tabIds: [1, 2, 3] }]);
+  });
+
+  it("regroups when the group holds an unrelated tab", () => {
+    const plan = domainGroupsToApply(
+      [
+        { id: 1, url: "https://github.com/a", groupId: 10 },
+        { id: 2, url: "https://example.com/x", groupId: 10 },
+      ],
+      [{ id: 10, title: "github.com" }],
+    );
+    // example.com is mixed into github.com's group, so both need regrouping.
+    expect(plan).toEqual([
+      { domain: "example.com", tabIds: [2] },
+      { domain: "github.com", tabIds: [1] },
+    ]);
+  });
+
+  it("regroups when the existing group title does not match the domain", () => {
+    const plan = domainGroupsToApply(
+      [{ id: 1, url: "https://github.com/a", groupId: 10 }],
+      [{ id: 10, title: "Work" }],
+    );
+    expect(plan).toEqual([{ domain: "github.com", tabIds: [1] }]);
+  });
+
+  it("only re-plans the domains that changed", () => {
+    const plan = domainGroupsToApply(
+      [
+        { id: 1, url: "https://github.com/a", groupId: 10 },
+        { id: 2, url: "https://example.com/x", groupId: NONE },
+      ],
+      [{ id: 10, title: "github.com" }],
+    );
+    expect(plan).toEqual([{ domain: "example.com", tabIds: [2] }]);
   });
 });
 
