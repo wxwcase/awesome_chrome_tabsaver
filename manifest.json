@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Tab Saver",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Save all open tabs and reload recent collections from the right-click menu.",
   "permissions": [
     "tabs",
+    "tabGroups",
     "storage",
     "contextMenus",
     "notifications"

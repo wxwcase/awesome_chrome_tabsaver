@@ -44,6 +44,16 @@
       .save-btn:hover { filter: brightness(0.95); }
       .save-btn.saved { background: var(--success); }
       .save-btn:disabled { opacity: 0.6; cursor: default; }
+      .group-btn {
+        flex: 0 0 auto;
+        background: var(--accent-soft); color: var(--accent);
+        border: 1px solid var(--border); border-radius: 6px;
+        padding: 8px 12px; font: inherit; font-weight: 600; cursor: pointer;
+        white-space: nowrap;
+      }
+      .group-btn:hover { filter: brightness(0.97); }
+      .group-btn.grouped { background: var(--success); color: #fff; border-color: var(--success); }
+      .group-btn:disabled { opacity: 0.6; cursor: default; }
       .sub { color: var(--muted); font-size: 13px; margin: 0; text-align: right; }
       .search-row { display: flex; gap: 8px; align-items: stretch; }
       .show-all-btn {
@@ -132,6 +142,7 @@
   <body>
     <header>
       <div class="save-row">
+        <button id="group" class="group-btn" type="button">Group tabs</button>
         <button id="save" class="save-btn" type="button">Save all tabs</button>
       </div>
       <div class="search-row">

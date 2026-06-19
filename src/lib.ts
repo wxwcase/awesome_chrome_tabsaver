@@ -37,6 +37,40 @@ export function nextRecent(
   return trim([candidate, ...prev]);
 }
 
+export interface GroupableTab {
+  id: number | undefined;
+  url: string | undefined;
+}
+
+export interface DomainGroup {
+  domain: string;
+  tabIds: number[];
+}
+
+export function domainFromUrl(url: string | undefined): string {
+  if (!url) return "";
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
+export function planDomainGroups(tabs: GroupableTab[]): DomainGroup[] {
+  const byDomain = new Map<string, number[]>();
+  for (const t of tabs) {
+    if (typeof t.id !== "number") continue;
+    const domain = domainFromUrl(t.url);
+    if (domain === "") continue;
+    const list = byDomain.get(domain) ?? [];
+    list.push(t.id);
+    byDomain.set(domain, list);
+  }
+  return [...byDomain.keys()]
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }))
+    .map((domain) => ({ domain, tabIds: byDomain.get(domain)! }));
+}
+
 export interface SearchHit {
   collectionIndex: number;
   tabIndex: number;

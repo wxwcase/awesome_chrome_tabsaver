@@ -1,9 +1,10 @@
-import { matchesQuery } from "./lib.js";
+import { matchesQuery, planDomainGroups } from "./lib.js";
 
 const input = document.getElementById("q") as HTMLInputElement;
 const results = document.getElementById("results") as HTMLDivElement;
 const sub = document.getElementById("sub") as HTMLParagraphElement;
 const saveBtn = document.getElementById("save") as HTMLButtonElement;
+const groupBtn = document.getElementById("group") as HTMLButtonElement;
 const showAllBtn = document.getElementById("show-all") as HTMLButtonElement;
 
 let tabs: chrome.tabs.Tab[] = [];
@@ -18,6 +19,7 @@ input.addEventListener("input", () => {
   render(input.value);
 });
 saveBtn.addEventListener("click", handleSave);
+groupBtn.addEventListener("click", handleGroup);
 showAllBtn.addEventListener("click", () => {
   showAll = true;
   render(input.value);
@@ -57,6 +59,28 @@ async function handleSave(): Promise<void> {
     saveBtn.classList.remove("saved");
     saveBtn.textContent = original;
     saveBtn.disabled = false;
+  }, 1500);
+}
+
+async function handleGroup(): Promise<void> {
+  groupBtn.disabled = true;
+  const original = groupBtn.textContent;
+  try {
+    const winTabs = await chrome.tabs.query({ currentWindow: true, pinned: false });
+    const plan = planDomainGroups(winTabs.map((t) => ({ id: t.id, url: t.url })));
+    for (const { domain, tabIds } of plan) {
+      const groupId = await chrome.tabs.group({ tabIds });
+      await chrome.tabGroups.update(groupId, { title: domain });
+    }
+    groupBtn.classList.add("grouped");
+    groupBtn.textContent = `Grouped ${plan.length} domain${plan.length === 1 ? "" : "s"}`;
+  } catch {
+    groupBtn.textContent = "Group failed";
+  }
+  setTimeout(() => {
+    groupBtn.classList.remove("grouped");
+    groupBtn.textContent = original;
+    groupBtn.disabled = false;
   }, 1500);
 }
 

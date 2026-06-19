@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   byteSize,
   type Collection,
+  domainFromUrl,
   MAX_BYTES,
   matchesQuery,
   nextRecent,
+  planDomainGroups,
   sameUrls,
   searchTabs,
   trim,
@@ -121,6 +123,63 @@ describe("searchTabs", () => {
     };
     expect(() => searchTabs([sparse], "x")).not.toThrow();
     expect(searchTabs([sparse], "x")).toHaveLength(1);
+  });
+});
+
+describe("domainFromUrl", () => {
+  it("extracts the hostname", () => {
+    expect(domainFromUrl("https://github.com/foo/bar")).toBe("github.com");
+  });
+
+  it("strips a leading www.", () => {
+    expect(domainFromUrl("https://www.github.com/foo")).toBe("github.com");
+  });
+
+  it("returns empty string for undefined or unparseable urls", () => {
+    expect(domainFromUrl(undefined)).toBe("");
+    expect(domainFromUrl("about:blank")).toBe("");
+    expect(domainFromUrl("not a url")).toBe("");
+  });
+});
+
+describe("planDomainGroups", () => {
+  it("groups tab ids by domain", () => {
+    const plan = planDomainGroups([
+      { id: 1, url: "https://github.com/a" },
+      { id: 2, url: "https://github.com/b" },
+      { id: 3, url: "https://example.com/x" },
+    ]);
+    expect(plan).toEqual([
+      { domain: "example.com", tabIds: [3] },
+      { domain: "github.com", tabIds: [1, 2] },
+    ]);
+  });
+
+  it("orders domains alphabetically", () => {
+    const plan = planDomainGroups([
+      { id: 1, url: "https://zebra.com/" },
+      { id: 2, url: "https://apple.com/" },
+      { id: 3, url: "https://mango.com/" },
+    ]);
+    expect(plan.map((g) => g.domain)).toEqual(["apple.com", "mango.com", "zebra.com"]);
+  });
+
+  it("treats www. and bare hosts as the same domain", () => {
+    const plan = planDomainGroups([
+      { id: 1, url: "https://www.github.com/a" },
+      { id: 2, url: "https://github.com/b" },
+    ]);
+    expect(plan).toEqual([{ domain: "github.com", tabIds: [1, 2] }]);
+  });
+
+  it("skips tabs without an id or a groupable url", () => {
+    const plan = planDomainGroups([
+      { id: undefined, url: "https://github.com/a" },
+      { id: 1, url: "about:blank" },
+      { id: 2, url: undefined },
+      { id: 3, url: "https://example.com/x" },
+    ]);
+    expect(plan).toEqual([{ domain: "example.com", tabIds: [3] }]);
   });
 });
 
