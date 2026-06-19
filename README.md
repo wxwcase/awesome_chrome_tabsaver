@@ -1,5 +1,7 @@
 # Tab Saver
 
+**[Install from the Chrome Web Store →](https://chromewebstore.google.com/detail/tab-saver/kcbcjippfgjfefgjalaaoffgnilhmbgj)**
+
 Chrome extension (Manifest V3). Click the toolbar icon to open a popup that lets you save every open tab across every Chrome window, group the active window's tabs into Chrome tab groups by domain, search your currently open tabs (click a result to switch, or the **×** to close it), or jump to the right-click "Load tab collection" submenu to reopen a saved snapshot.
 
 Sources are in `src/` (`background.ts`, `popup.ts`, helpers in `lib.ts`); they compile to `dist/*.js`, which is what Chrome actually loads. There's no bundler — just `tsc`.
