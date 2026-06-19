@@ -1,6 +1,6 @@
 # Privacy Policy — Tab Saver
 
-_Last updated: 2026-06-18_
+_Last updated: 2026-06-19_
 
 Tab Saver ("the extension") is a Chrome extension that saves the tabs you have
 open and lets you reload recent collections from a popup and right-click menu.
@@ -39,6 +39,7 @@ This data is only read at the moment you ask the extension to save your tabs.
 | Permission     | Why it is requested                                                        |
 |----------------|----------------------------------------------------------------------------|
 | `tabs`         | Read the URL and title of open tabs so they can be saved as a collection.  |
+| `tabGroups`    | Organize the current window's tabs into native Chrome tab groups by domain when you click "Group tabs". |
 | `storage`      | Persist saved collections locally in `chrome.storage.local`.               |
 | `contextMenus` | Provide a right-click menu to reload a saved collection.                   |
 | `notifications`| Show a confirmation when a collection is saved.                            |
