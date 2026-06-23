@@ -4,6 +4,7 @@ import {
   type Collection,
   domainFromUrl,
   domainGroupsToApply,
+  labelDomains,
   MAX_BYTES,
   matchesQuery,
   nextRecent,
@@ -144,16 +145,47 @@ describe("domainFromUrl", () => {
   });
 });
 
+describe("labelDomains", () => {
+  it("drops the registrable domain + TLD", () => {
+    const labels = labelDomains(["somewebsite.amazon.com", "docs.aws.amazon.com"]);
+    expect(labels.get("somewebsite.amazon.com")).toBe("somewebsite");
+    expect(labels.get("docs.aws.amazon.com")).toBe("docs.aws");
+  });
+
+  it("drops only the TLD for a bare two-label domain", () => {
+    expect(labelDomains(["github.com"]).get("github.com")).toBe("github");
+  });
+
+  it("keeps deeper segments until distinct when labels collide", () => {
+    const labels = labelDomains(["somewebsite.amazon.com", "somewebsite.google.com"]);
+    expect(labels.get("somewebsite.amazon.com")).toBe("somewebsite.amazon");
+    expect(labels.get("somewebsite.google.com")).toBe("somewebsite.google");
+  });
+
+  it("falls back to the full domain when only the TLD differs", () => {
+    // Both shorten to "foo"; disambiguation walks all the way to the full domain.
+    const labels = labelDomains(["foo.co", "foo.com"]);
+    expect(labels.get("foo.co")).toBe("foo.co");
+    expect(labels.get("foo.com")).toBe("foo.com");
+  });
+
+  it("leaves non-colliding domains short", () => {
+    const labels = labelDomains(["docs.amazon.com", "github.com"]);
+    expect(labels.get("docs.amazon.com")).toBe("docs");
+    expect(labels.get("github.com")).toBe("github");
+  });
+});
+
 describe("planDomainGroups", () => {
-  it("groups tab ids by domain", () => {
+  it("groups tab ids by domain with a shortened label", () => {
     const plan = planDomainGroups([
       { id: 1, url: "https://github.com/a" },
       { id: 2, url: "https://github.com/b" },
       { id: 3, url: "https://example.com/x" },
     ]);
     expect(plan).toEqual([
-      { domain: "example.com", tabIds: [3] },
-      { domain: "github.com", tabIds: [1, 2] },
+      { domain: "example.com", label: "example", tabIds: [3] },
+      { domain: "github.com", label: "github", tabIds: [1, 2] },
     ]);
   });
 
@@ -171,7 +203,7 @@ describe("planDomainGroups", () => {
       { id: 1, url: "https://www.github.com/a" },
       { id: 2, url: "https://github.com/b" },
     ]);
-    expect(plan).toEqual([{ domain: "github.com", tabIds: [1, 2] }]);
+    expect(plan).toEqual([{ domain: "github.com", label: "github", tabIds: [1, 2] }]);
   });
 
   it("skips tabs without an id or a groupable url", () => {
@@ -181,7 +213,7 @@ describe("planDomainGroups", () => {
       { id: 2, url: undefined },
       { id: 3, url: "https://example.com/x" },
     ]);
-    expect(plan).toEqual([{ domain: "example.com", tabIds: [3] }]);
+    expect(plan).toEqual([{ domain: "example.com", label: "example", tabIds: [3] }]);
   });
 });
 
@@ -197,18 +229,18 @@ describe("domainGroupsToApply", () => {
       [],
     );
     expect(plan).toEqual([
-      { domain: "example.com", tabIds: [2] },
-      { domain: "github.com", tabIds: [1] },
+      { domain: "example.com", label: "example", tabIds: [2] },
+      { domain: "github.com", label: "github", tabIds: [1] },
     ]);
   });
 
-  it("skips a domain already correctly grouped", () => {
+  it("skips a domain already correctly grouped (title matches the label)", () => {
     const plan = domainGroupsToApply(
       [
         { id: 1, url: "https://github.com/a", groupId: 10 },
         { id: 2, url: "https://github.com/b", groupId: 10 },
       ],
-      [{ id: 10, title: "github.com" }],
+      [{ id: 10, title: "github" }],
     );
     expect(plan).toEqual([]);
   });
@@ -220,9 +252,9 @@ describe("domainGroupsToApply", () => {
         { id: 2, url: "https://github.com/b", groupId: 10 },
         { id: 3, url: "https://github.com/c", groupId: NONE },
       ],
-      [{ id: 10, title: "github.com" }],
+      [{ id: 10, title: "github" }],
     );
-    expect(plan).toEqual([{ domain: "github.com", tabIds: [1, 2, 3] }]);
+    expect(plan).toEqual([{ domain: "github.com", label: "github", tabIds: [1, 2, 3] }]);
   });
 
   it("regroups when the group holds an unrelated tab", () => {
@@ -231,21 +263,21 @@ describe("domainGroupsToApply", () => {
         { id: 1, url: "https://github.com/a", groupId: 10 },
         { id: 2, url: "https://example.com/x", groupId: 10 },
       ],
-      [{ id: 10, title: "github.com" }],
+      [{ id: 10, title: "github" }],
     );
     // example.com is mixed into github.com's group, so both need regrouping.
     expect(plan).toEqual([
-      { domain: "example.com", tabIds: [2] },
-      { domain: "github.com", tabIds: [1] },
+      { domain: "example.com", label: "example", tabIds: [2] },
+      { domain: "github.com", label: "github", tabIds: [1] },
     ]);
   });
 
-  it("regroups when the existing group title does not match the domain", () => {
+  it("regroups when the existing group title does not match the label", () => {
     const plan = domainGroupsToApply(
       [{ id: 1, url: "https://github.com/a", groupId: 10 }],
       [{ id: 10, title: "Work" }],
     );
-    expect(plan).toEqual([{ domain: "github.com", tabIds: [1] }]);
+    expect(plan).toEqual([{ domain: "github.com", label: "github", tabIds: [1] }]);
   });
 
   it("only re-plans the domains that changed", () => {
@@ -254,9 +286,9 @@ describe("domainGroupsToApply", () => {
         { id: 1, url: "https://github.com/a", groupId: 10 },
         { id: 2, url: "https://example.com/x", groupId: NONE },
       ],
-      [{ id: 10, title: "github.com" }],
+      [{ id: 10, title: "github" }],
     );
-    expect(plan).toEqual([{ domain: "example.com", tabIds: [2] }]);
+    expect(plan).toEqual([{ domain: "example.com", label: "example", tabIds: [2] }]);
   });
 });
 

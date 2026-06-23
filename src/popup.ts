@@ -72,9 +72,9 @@ async function handleGroup(): Promise<void> {
       winTabs.map((t) => ({ id: t.id, url: t.url, groupId: t.groupId })),
       existing.map((g) => ({ id: g.id, title: g.title })),
     );
-    for (const { domain, tabIds } of plan) {
+    for (const { label, tabIds } of plan) {
       const groupId = await chrome.tabs.group({ tabIds });
-      await chrome.tabGroups.update(groupId, { title: domain });
+      await chrome.tabGroups.update(groupId, { title: label });
     }
     groupBtn.classList.add("grouped");
     groupBtn.textContent =
